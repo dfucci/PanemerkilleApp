@@ -1,0 +1,72 @@
+.ui-icon-footbar-panemerkille-profile {
+	background-image: url("../images/footbar-panemerkille-profile.png");
+	width: 36px!important;
+	height: 36px!important;
+	margin-left: -15px !important;
+	background-color: transparent;
+	background-size: 36px 36px;
+}
+.ui-navbar .ui-btn-icon-top .ui-btn-inner {
+padding-top: 0px;
+height:53px;
+}
+
+.ui-icon-footbar-panemerkille-friends {
+	background-image: url("../images/footbar-panemerkille-friends.png");
+	width: 36px!important;
+	height: 36px!important;
+	margin-left: -15px !important;
+	background-color: transparent;
+	background-size: 36px 36px;
+}
+
+.ui-icon-footbar-panemerkille-patches {
+	background-image: url("../images/footbar-panemerkille-patches.png");
+	width: 36px!important;
+	height: 36px!important;
+	margin-left: -15px !important;
+	background-color: transparent;
+	background-size: 36px 36px;
+}
+
+.ui-icon-footbar-panemerkille-parties {
+	background-image: url("../images/footbar-panemerkille-parties.png");
+	width: 36px!important;
+	height: 36px!important;
+	margin-left: -15px !important;
+	background-color: transparent;
+	background-size: 36px 36px;
+}
+
+
+
+.pos-left{
+	width:33% !important;
+	font-weight: bold;
+	font-family: 'Lobster Two';
+}
+
+.pos-right{
+	width:67% !important;
+	
+
+}
+
+.box-padding{
+	padding-left:10px;
+	padding-right:10px;
+}
+
+#picture_url{
+	max-width: 95%;
+}
+
+/*Font*/
+@font-face{
+	font-family: 'Lobster Two';
+	src: url('../font/LobsterTwo-Bold.otf');
+}
+
+.ui-header .ui-title, .ui-footer .ui-title, .ui-li-divider, .ui-li-heading {
+font-family: 'Lobster Two';
+}
