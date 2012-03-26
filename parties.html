@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/jquery.mobile.css" />
+  <link rel="stylesheet" href="css/custom.css" />
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.mobile.js"></script>
+  <script src="js/cordova.js"></script>
+  <script type="text/javascript">
+    var host = "http://localhost:7777";
+    var facebook_id = "641892040";
+    function init () {
+
+  //   $.getJSON(host+"/users",{
+  //       facebook_id : facebook_id
+  //     }, function (data) {
+  //        $("#picture_url").attr("src", data[0].picture_url);
+  //        $("#firstname").html(data[0].name.firstname);
+  //        $("#surname").html(data[0].name.surname);
+  //        $("#patch_counter").html(data[0].patches.length);
+  //        $("#checkin_counter").html(data[0].checkins.length);
+
+  //        for (var i=0; i< data[0].patches.length; i++) {
+  //           var k = 0;
+  //           $.getJSON(host+'/patches/'+data[0].patches[i].patch, function(data) {
+  //               var patch_name = data.name;
+  //               var patch_url = data.image_url;
+  //           switch (k%4){
+  //             case 0:
+  //             $('#patchgrid').append('<div class="ui-block-a"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+  //             break;
+
+  //             case 1:
+  //             $('#patchgrid').append('<div class="ui-block-b">  <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+  //             break;
+
+  //             case 2:
+  //             $('#patchgrid').append('<div class="ui-block-c"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+  //             break;
+
+  //             case 3:
+  //             $('#patchgrid').append('<div class="ui-block-d"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+  //             break;
+  //           }     
+  //             console.log(k);
+  //               k++;
+  //           });
+  //         }
+  //   });
+   }
+  </script>
+</head>
+<body onload="init();">
+
+  <div data-role="page" data-theme="a">
+
+    <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="profile">
+      <h1>Parties</h1>
+    </div>
+
+    <div data-role="content" data-theme="a">
+
+        <ul data-role="listview" data-inset="false" data-filter="false" data-theme="a">
+        <li  data-role="list-divider">Today</li>
+          <li>
+            <a href="party.html">
+              <img src="images/posters/1.png" alt="" class="ui-li-thumb">
+              <h3>Pirate Party</h3>
+              <p>@The Club - 22:00</p>
+            </a>
+          </li>
+          <li>
+          
+            <a href="party.html" >
+              <img src="images/posters/2.jpg" alt="" class="ui-li-thumb">
+              <h3>White Party</h3>
+              <p>@The Other Club - 23:00</p>
+            </a>
+          </li>
+          <li  data-role="list-divider">Coming up</li>
+          <li>
+            
+            <a href="party.html">
+              <img src="images/posters/3.jpg" alt="" class="ui-li-thumb">
+              <h3>Caribbean Fever</h3>
+              <p>@The Disco - Tomorrow</p>
+            </a>
+          </li>
+          <li>
+           
+            <a href="party.html">
+              <img src="images/posters/4.jpeg" alt="" class="ui-li-thumb">
+              <h3>Black Party</h3>
+              <p>@The Disco - Tomorrow</p>
+            </a>
+          </li>
+           <li>
+            
+            <a href="party.html">
+              <img src="images/posters/5.jpg" alt="" class="ui-li-thumb">
+              <h3>Pink Party</h3>
+              <p>@The Lounge - on Monday</p>
+            </a>
+          </li>
+           <li>
+           
+            <a href="party.html">
+              <img src="images/posters/6.jpg" alt="" class="ui-li-thumb">
+              <h3>Red Party</h3>
+              <p>@The Disco - on Tuesday</p>
+            </a>
+          </li>
+           <li>
+        
+            <a href="party.html">
+              <img src="images/posters/7.jpg" alt="" class="ui-li-thumb">
+              <h3>Yellow Party</h3>
+              <p>@The Disco - on Wednesday</p>
+            </a>
+          </li>
+           <li>
+           
+            <a href="party.html">
+              <img src="images/posters/8.jpg" alt="" class="ui-li-thumb">
+              <h3>Blue Party</h3>
+              <p>@The Disco - on Friday</p>
+            </a>
+          </li>
+        </ul>
+
+    </div>
+    <!-- TODO: persistent navbar -->
+    <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false">
+      <div data-role="navbar">
+        <ul>
+          <li>
+            <a href="#" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="#" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active"></a>
+          </li>
+          <li>
+            <a href="#" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="#" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" ></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

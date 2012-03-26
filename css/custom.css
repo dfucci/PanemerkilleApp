@@ -70,3 +70,13 @@ height:53px;
 .ui-header .ui-title, .ui-footer .ui-title, .ui-li-divider, .ui-li-heading {
 font-family: 'Lobster Two';
 }
+
+/*Checkin page*/
+.page-joined .ui-listview .ui-li-icon {
+max-height: 30px !important;
+max-width: 30px !important;
+left: 6px !important;
+top: 4px !important;
+}
+
+
