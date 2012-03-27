@@ -8,47 +8,79 @@
   <script src="js/jquery.js"></script>
   <script src="js/jquery.mobile.js"></script>
   <script src="js/cordova.js"></script>
+  <script src="js/app.js"></script>
   <script type="text/javascript">
     var host = "http://localhost:7777";
-    var facebook_id = "641892040";
+    //var facebook_id = "641892040";
+
     function init () {
+      var user = loadUser(host, "641892040");
+$(document).bind( "pagebeforechange", function( e, data ) {
 
-    $.getJSON(host+"/users",{
-        facebook_id : facebook_id
-      }, function (data) {
-         $("#picture_url").attr("src", data[0].picture_url);
-         $("#firstname").html(data[0].name.firstname);
-         $("#surname").html(data[0].name.surname);
-         $("#patch_counter").html(data[0].patches.length);
-         $("#checkin_counter").html(data[0].checkins.length);
+  // We only want to handle changePage() calls where the caller is
+  // asking us to load a page by URL.
+  if ( typeof data.toPage === "string" ) {
 
-         for (var i=0; i< data[0].patches.length; i++) {
-            var k = 0;
-            $.getJSON(host+'/patches/'+data[0].patches[i].patch, function(data) {
-                var patch_name = data.name;
-                var patch_url = data.image_url;
-            switch (k%4){
-              case 0:
-              $('#patchgrid').append('<div class="ui-block-a"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-              break;
+    // We are being asked to load a page by URL, but we only
+    // want to handle URLs that request the data for a specific
+    // category.
+    var u = $.mobile.path.parseUrl( data.toPage ),
+      re = /^#yourpatches/;
 
-              case 1:
-              $('#patchgrid').append('<div class="ui-block-b">  <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-              break;
+    if ( u.hash.search(re) !== -1 ) {
 
-              case 2:
-              $('#patchgrid').append('<div class="ui-block-c"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-              break;
+      // We're being asked to display the items for a specific category.
+      // Call our internal method that builds the content for the category
+      // on the fly based on our in-memory category data structure.
+      showUserPatches( u, data.options, user );
+      console.log(u);
+      console.log(data.options);
+      // Make sure to tell changePage() we've handled this call so it doesn't
+      // have to do anything.
+     // e.preventDefault();
+    }
+  }
+});
+function showUserPatches(url, options, user){
+  var patches=user[0].patches;
 
-              case 3:
-              $('#patchgrid').append('<div class="ui-block-d"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-              break;
-            }     
-              console.log(k);
-                k++;
-            });
-          }
-    });
+}
+    // $.getJSON(host+"/users",{
+    //     facebook_id : facebook_id
+    //   }, function (data) {
+    //      $("#picture_url").attr("src", data[0].picture_url);
+    //      $("#firstname").html(data[0].name.firstname);
+    //      $("#surname").html(data[0].name.surname);
+    //      $("#patch_counter").html(data[0].patches.length);
+    //      $("#checkin_counter").html(data[0].checkins.length);
+
+         // for (var i=0; i< data[0].patches.length; i++) {
+         //    var k = 0;
+         //    $.getJSON(host+'/patches/'+data[0].patches[i].patch, function(data) {
+         //        var patch_name = data.name;
+         //        var patch_url = data.image_url;
+         //    switch (k%4){
+         //      case 0:
+         //      $('#patchgrid').append('<div class="ui-block-a"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+         //      break;
+
+         //      case 1:
+         //      $('#patchgrid').append('<div class="ui-block-b">  <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+         //      break;
+
+         //      case 2:
+         //      $('#patchgrid').append('<div class="ui-block-c"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+         //      break;
+
+         //      case 3:
+         //      $('#patchgrid').append('<div class="ui-block-d"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
+         //      break;
+         //    }     
+         //      console.log(k);
+         //        k++;
+         //    });
+         //  }
+ //   });
   }
   </script>
 </head>
@@ -76,10 +108,19 @@
           <li data-role="list-divider" role="heading">Stats</li>
           <li data-theme="a">
             <a href="#page1" data-transition="slide">
-              <img src="images/user-checkins.png" class=ui-li-thumb><h3 class="ui-li-heading">Check-ins</h3> <p class="ui-li-desc">Your check-ins</p><span id="checkin_counter" class="ui-li-count">0</span></a>
+              <img src="images/user-checkins.png" class=ui-li-thumb>
+              <h3 class="ui-li-heading">Check-ins</h3>
+              <p class="ui-li-desc">Your check-ins</p>
+              <span id="checkin_counter" class="ui-li-count">0</span>
+            </a>
           </li>
           <li data-theme="a">
-            <a href="#yourpatches" data-transition="slide"><img src="images/footbar-panemerkille-patches.png" class=ui-li-thumb><h3 class="ui-li-heading">Patches</h3><p class="ui-li-desc">Your patches</p><span id="patch_counter" class="ui-li-count">0</span></a>
+            <a href="#yourpatches?user=user" data-transition="slide">
+              <img src="images/footbar-panemerkille-patches.png" class=ui-li-thumb>
+              <h3 class="ui-li-heading">Patches</h3>
+              <p class="ui-li-desc">Your patches</p>
+              <span id="patch_counter" class="ui-li-count">0</span>
+            </a>
           </li>
         </ul>
       </div>
@@ -111,13 +152,13 @@
   <div data-role="page" data-theme="a" id="yourpatches">
 
     <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed">
+      <a data-rel="back" data-icon="back">Back</a>
       <h1>Your Patches</h1>
     </div>
-<div data-role="content">
-                <div class="ui-grid-c" id="patchgrid">
-                    
-                </div>
-            </div>    
+    <div data-role="content">
+      <div class="ui-grid-c" id="patchgrid"></div>
+    </div>
   </div>
+
 </body>
 </html>
