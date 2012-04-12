@@ -1,4 +1,5 @@
-var endpoint = "http://localhost:7777";
+//var DEBUG="http://localhost:7777";
+var endpoint =  "http://blazing-mist-8758.herokuapp.com";
 var user = {};
 $('#yourpatches').live('pageshow', function(event) {
     console.log('fired');
@@ -6,32 +7,31 @@ $('#yourpatches').live('pageshow', function(event) {
     $.getJSON(endpoint + '/users/' + id, displayPatches);
 });
 
+$('#yourcheckins').live('pageshow', function(event) {
+    console.log('fired');
+    var id = getUrlVars()["user"];
+    $.getJSON(endpoint + '/users/' + id, displayCheckins);
+});
+function displayCheckins (data) {
+    var checkins = data.checkins;
+    var blocks=['a','b','c','d'];
+    $.each(checkins, function(index, c) {
+        var event_name = c.event.name;
+        var event_poster = c.event.poster_url;
+        var k=index%4;
+        var cls ="ui-block-" + blocks[k];
+        $('#checkingrid').append('<div class='+cls+'> <div><img src="' + event_poster + '"></div></div>');
+    });
+}
 function displayPatches(data) {
     var patches = data.patches;
-    console.log(patches);
     var blocks=['a','b','c','d'];
     $.each(patches, function(index, p) {
         var patch_name = p.patch.name;
-        var patch_url = p.patch.image_url;
+        var patch_image = p.patch.image_url;
         var k=index%4;
         var cls ="ui-block-" + blocks[k];
-       // switch (k % 4) {
-       // case 0:
-            $('#patchgrid').append('<div class='+cls+'> <div><img src="' + patch_url + '"></div><div>' + patch_name + '</div> </div>');
-        //     break;
-          //  $('#patchgrid').add('div').addClass(cls).add('div').add('img').attr('src', patch_url).after('div').html(patch_name);
-        // case 1:
-        //     $('#patchgrid').append('<div class="ui-block-b">  <div><img src="' + patch_url + '"></div><div>' + patch_name + '</div> </div>');
-        //     break;
-
-        // case 2:
-        //     $('#patchgrid').append('<div class="ui-block-c"> <div><img src="' + patch_url + '"></div><div>' + patch_name + '</div> </div>');
-        //     break;
-
-        // case 3:
-        //     $('#patchgrid').append('<div class="ui-block-d"> <div><img src="' + patch_url + '"></div><div>' + patch_name + '</div> </div>');
-        //     break;
-        // }
+        $('#patchgrid').append('<div class='+cls+'> <div><img src="' + patch_image + '"></div><div>' + patch_name + '</div> </div>');
     });
 }
 
@@ -74,6 +74,7 @@ function populateUser(){
          $("#patch_counter").html(data.patches.length);
          $("#checkin_counter").html(data.checkins.length);
          $("#userPatchesLink").attr('href', 'userPatches.html?user='+user.id);
+         $("#userCheckinLink").attr('href', 'userCheckins.html?user='+user.id);
     });
 }
     
