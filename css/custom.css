@@ -1,3 +1,26 @@
+#connect{
+	background-image: url("../images/splash_b.jpg");
+	background-repeat:no-repeat;
+	background-size:320px 480px;
+}
+#connectContent{
+	background-color: transparent;
+	padding-top:300px;
+	background-image:none;
+}
+
+/*Custom Icons*/
+.ui-icon-fbConnect{
+	background-image: url("../images/facebook.png");
+	width: 20px!important;
+	height: 20px!important;
+	background-color: transparent;
+	background-size: 20px 20px;
+	-moz-border-radius:     0;
+    -webkit-border-radius:  0;
+    border-radius:          0;
+    margin-left:12px;
+}
 .ui-icon-footbar-panemerkille-profile {
 	background-image: url("../images/footbar-panemerkille-profile.png");
 	width: 36px!important;
