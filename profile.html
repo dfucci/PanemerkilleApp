@@ -1,0 +1,81 @@
+<!-- TODO: metti i default -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/jquery.mobile.css" />
+  <link rel="stylesheet" href="css/custom.css" />
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.mobile.js"></script>
+  <script src="js/cordova.js"></script>
+  <script src="js/app.js"></script>
+<script src="cdv-plugin-fb-connect.js"></script>
+      <script src="facebook_js_skd.js"></script>
+</head>
+<body>
+
+  <div data-role="page" data-theme="a" id='profile'>
+
+    <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="profileHeader">
+      <h1>Profile</h1>
+    </div>
+
+    <div data-role="content" data-theme="a">
+      <div class="ui-grid-a ">
+        <div class="ui-block-a" >
+          <img id="picture_url" src="#"></div>
+        <div class="ui-block-b">
+          <div class="box-padding">
+            <div id="firstname"></div>
+            <div id="surname"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <ul data-role="listview" data-theme="a" data-inset="true">
+          <li data-role="list-divider" role="heading">Stats</li>
+          <li data-theme="a">
+            <a href="#" data-transition="slide" id="userCheckinLink">
+              <img src="images/user-checkins.png" class=ui-li-thumb>
+              <h3 class="ui-li-heading">Poster Wall</h3>
+              <p class="ui-li-desc">Your parties</p>
+              <span id="checkin_counter" class="ui-li-count">0</span>
+            </a>
+          </li>
+          <li data-theme="a">
+            <a href="#" data-transition="slide" id="userPatchesLink">
+              <img src="images/footbar-panemerkille-patches.png" class=ui-li-thumb>
+              <h3 class="ui-li-heading">Patches</h3>
+              <p class="ui-li-desc">Your patches</p>
+              <span id="patch_counter" class="ui-li-count">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- TODO: persistent navbar -->
+    <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false">
+      <div data-role="navbar">
+        <ul>
+          <li>
+            <a href="#" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="parties.html" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="#" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="#" data-transition="slide" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active ui-state-persist"></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+</body>
+</html>

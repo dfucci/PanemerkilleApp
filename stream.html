@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/jquery.mobile.css" />
+  <link rel="stylesheet" href="css/custom.css" />
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.mobile.js"></script>
+  <script src="cordova-1.6.0.js"></script>
+  <script src="cdv-plugin-fb-connect.js"></script>
+  <script src="facebook_js_sdk.js"></script>
+  <script type="text/javascript">
+  
+$("#connect").live('pageshow', function() {
+  console.log('init strea');
+  FB.init({
+    appId: "366089376758944",
+    nativeInterface: CDV.FB,
+    useCachedDialogs: false
+  });
+});
+
+$("#fbConnect").live('click', function(e) {
+  FB.logout(function(response) {
+    console.log('logout');
+    $(location).attr('href', 'connect.html');
+  });
+});
+
+  </script>
+</head>
+<body>
+
+  <div data-role="page" data-theme="a" id="connect">
+
+    <div data-role="content" data-theme="a" id="connectContent">
+       <a data-role="button" data-icon="fbConnect" data-theme="b" id="fbConnect">Log out</a> 
+    <!-- <button onclick="login()">Login</button> -->
+    </div>
+  </div>
+</body>
+</html>
