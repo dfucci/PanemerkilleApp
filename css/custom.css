@@ -7,8 +7,23 @@
 	background-color: transparent;
 	padding-top:300px;
 	background-image:none;
+
+	/*Profile*/
+}
+.poster  {
+	width: 75px; 
+	height: 120px; 
 }
 
+.patch {
+	width: 75px; 
+	height: 75px;
+	text-align: center;
+}
+
+#FBLogout {
+	margin-top: 25px;
+}
 /*Custom Icons*/
 .ui-icon-fbConnect{
 	background-image: url("../images/facebook.png");

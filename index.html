@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Stream</title>
+  <title>Index</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/jquery.mobile.css" />
   <link rel="stylesheet" href="css/custom.css" />
@@ -12,7 +13,7 @@
   <script src="cdv-plugin-fb-connect.js"></script>
   <script src="facebook_js_sdk.js"></script>
   <script type="text/javascript">
-    document.addEventListener('deviceready', function() {
+    document.addEventListener('deviceready', function() { //PhoneGap
       console.log('init');
       try {
         FB.init({
@@ -22,7 +23,7 @@
         });
         FB.getLoginStatus(function(response) {
           if (response.status == 'connected') {
-            $(location).attr('href','stream.html');
+            $(location).attr('href','profile.html');
           } else {
             $(location).attr('href','connect.html');
           }
@@ -34,6 +35,7 @@
     }, false);
   </script>
 </head>
+
 <body>
 
 </body>

@@ -4,23 +4,37 @@
 <head>
   <title>Profile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="css/jquery.mobile.css" />
   <link rel="stylesheet" href="css/custom.css" />
   <script src="js/jquery.js"></script>
   <script src="js/jquery.mobile.js"></script>
-  <script src="js/cordova.js"></script>
+  <script src="cordova-1.6.0.js"></script>
+  <script src="cdv-plugin-fb-connect.js"></script>
+  <script src="facebook_js_sdk.js"></script>
   <script src="js/app.js"></script>
-<script src="cdv-plugin-fb-connect.js"></script>
-      <script src="facebook_js_skd.js"></script>
+
+  <script type="text/javascript">
+  $('#FBLogout').live('tap', function(){
+    FB.init({
+      appId: "366089376758944",
+      nativeInterface: CDV.FB,
+      useCachedDialogs: false
+    });
+    FB.logout(function(response){
+       $(location).attr('href', 'connect.html');
+    });
+  });
+
+
+
+</script>
 </head>
 <body>
-
   <div data-role="page" data-theme="a" id='profile'>
-
     <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="profileHeader">
       <h1>Profile</h1>
     </div>
-
     <div data-role="content" data-theme="a">
       <div class="ui-grid-a ">
         <div class="ui-block-a" >
@@ -29,6 +43,7 @@
           <div class="box-padding">
             <div id="firstname"></div>
             <div id="surname"></div>
+            <a data-role="button" data-mini="true" data-theme="b" id="FBLogout" href="#">Logout</a> 
           </div>
         </div>
       </div>
@@ -76,6 +91,6 @@
   </div>
 
 
-
 </body>
+
 </html>
