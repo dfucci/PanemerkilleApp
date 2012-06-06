@@ -1,3 +1,23 @@
+a:link {
+	color:white;
+	text-decoration:none;
+}   
+
+a:visited {
+	color:white;
+	text-decoration:none;
+}  
+
+a:hover {
+	color:white;
+	text-decoration:none;
+} 
+
+a:active {
+	color:white;
+	text-decoration:none;
+} 
+
 #connect{
 	background-image: url("../images/splash_b.jpg");
 	background-repeat:no-repeat;
@@ -8,19 +28,27 @@
 	padding-top:300px;
 	background-image:none;
 
-	/*Profile*/
 }
+	/*Profile*/
+
+#profilePictureImg{
+	width:100%;
+	height:auto;
+}
+
 .poster  {
 	width: 75px; 
 	height: 120px; 
 }
 
 .patch {
-	width: 75px; 
-	height: 75px;
 	text-align: center;
 }
 
+.patchImg{
+	width: 60px; 
+	height:auto;
+}
 #FBLogout {
 	margin-top: 25px;
 }

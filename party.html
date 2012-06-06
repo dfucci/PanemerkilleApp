@@ -8,52 +8,11 @@
   <link rel="stylesheet" href="css/custom.css" />
   <script src="js/jquery.js"></script>
   <script src="js/jquery.mobile.js"></script>
-  <script src="js/cordova.js"></script>
-  <script type="text/javascript">
-    var host = "http://localhost:7777";
-    var facebook_id = "641892040";
-    function init () {
+  <script src="js/cordova-1.6.0.js"></script>
+  <script src="js/app.js"></script>
 
-  //   $.getJSON(host+"/users",{
-  //       facebook_id : facebook_id
-  //     }, function (data) {
-  //        $("#picture_url").attr("src", data[0].picture_url);
-  //        $("#firstname").html(data[0].name.firstname);
-  //        $("#surname").html(data[0].name.surname);
-  //        $("#patch_counter").html(data[0].patches.length);
-  //        $("#checkin_counter").html(data[0].checkins.length);
-
-  //        for (var i=0; i< data[0].patches.length; i++) {
-  //           var k = 0;
-  //           $.getJSON(host+'/patches/'+data[0].patches[i].patch, function(data) {
-  //               var patch_name = data.name;
-  //               var patch_url = data.image_url;
-  //           switch (k%4){
-  //             case 0:
-  //             $('#patchgrid').append('<div class="ui-block-a"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-  //             break;
-
-  //             case 1:
-  //             $('#patchgrid').append('<div class="ui-block-b">  <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-  //             break;
-
-  //             case 2:
-  //             $('#patchgrid').append('<div class="ui-block-c"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-  //             break;
-
-  //             case 3:
-  //             $('#patchgrid').append('<div class="ui-block-d"> <div><img src="'+ patch_url+'"></div><div>'+patch_name+'</div> </div>');
-  //             break;
-  //           }     
-  //             console.log(k);
-  //               k++;
-  //           });
-  //         }
-  //   });
-   }
-  </script>
 </head>
-<body onload="init();">
+<body>
 
   <div data-role="page" data-theme="a">
 
@@ -99,25 +58,7 @@
 
         </div>
     </div>
-    <!-- TODO: persistent navbar -->
-<!--     <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false">
-      <div data-role="navbar">
-        <ul>
-          <li>
-            <a href="#" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
-          </li>
-          <li>
-            <a href="#" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active"></a>
-          </li>
-          <li>
-            <a href="#" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
-          </li>
-          <li>
-            <a href="#" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" ></a>
-          </li>
-        </ul>
-      </div>
-    </div> -->
+
   </div>
 </body>
 </html>

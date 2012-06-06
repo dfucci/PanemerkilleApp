@@ -1,14 +1,16 @@
 //var DEBUG="http://localhost:7777";
 var endpoint = "http://blazing-mist-8758.herokuapp.com";
 var user = {};
+
+
 $('#yourpatches').live('pageshow', function(event) {
-    console.log('fired');
     var id = getUrlVars()["user"];
     $.getJSON(endpoint + '/users/' + id, displayPatches);
 });
 
+
+
 $('#yourcheckins').live('pageshow', function(event) {
-    console.log('fired');
     var id = getUrlVars()["user"];
     $.getJSON(endpoint + '/users/' + id, displayCheckins);
 });
@@ -28,17 +30,40 @@ function displayCheckins(data) {
 function displayPatches(data) {
     var patches = data.patches;
     var blocks = ['a', 'b', 'c', 'd'];
+    $('#patchgrid').empty();
     $.each(patches, function(index, p) {
         var patch_name = p.patch.name;
         var patch_image = p.patch.image_url;
+        var patch_id = p.patch._id;
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#patchgrid').append('<div class=' + cls + '> <div><img class=patch src="' + patch_image + '"></div><div class=patch>' + patch_name + '</div> </div>');
+        $('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id='+ patch_id + '"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
     });
 }
 
+function displayAllPatches(data){
+    $('#patchgrid').empty();
+    var blocks = ['a', 'b', 'c', 'd'];
+    $.each(data, function(index, p) {
+        var patch_name = p.name;
+        var patch_image = p.image_url;
+        var patch_id = p._id;
+        var k = index % 4;
+        var cls = "ui-block-" + blocks[k];
+        $('#patchgrid').append('<div class=' + cls + '><a href="patch.html?id='+ patch_id + '"> <div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div> </div></a></div>');
+    });
+}
 
-//TODO: sostiture ready con phonegap.ondeviceready
+function displayPatch(data) {
+     $('#patchH1').html(data.name);
+     $('#patchContent').empty().append("<img src='" + data.image_url + "' />").append("<p>" + data.description + "</p>");
+
+    // $('#patchDesc').html(data.description);
+    // $('#patchImg').attr('src', data.image_url);
+
+}
+
+
 $('#profile').live('pagebeforecreate', function() { //TODO: carica l'id quando phonegap è pronto
     if (user.id == undefined) { //TODO: controlla lo storage per l'id
         facebook_id = '641892040';
@@ -56,7 +81,8 @@ $('#profile').live('pagebeforecreate', function() { //TODO: carica l'id quando p
 
 function populateUser() {
     $.getJSON(endpoint + "/users/" + user.id, function(data) {
-        $("#picture_url").attr("src", data.picture_url);
+        // $("#picture_url").attr("src", data.picture_url);
+        $("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
         $("#firstname").html(data.name.firstname);
         $("#surname").html(data.name.surname);
         $("#patch_counter").html(data.patches.length);
@@ -67,6 +93,15 @@ function populateUser() {
 }
 
 
+$('#patches').live('pageshow', function(event) {
+    $.getJSON(endpoint + '/patches/', displayAllPatches);
+});
+
+$('#patch').live('pageshow', function(event) {
+    var id = getUrlVars()["id"];
+
+    $.getJSON(endpoint + '/patches/' +id, displayPatch)
+});
 
 function getUrlVars() {
     var vars = [],
