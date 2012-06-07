@@ -66,7 +66,7 @@ function displayPatch(data) {
 
 $('#profile').live('pagebeforecreate', function() { //TODO: carica l'id quando phonegap è pronto
     if (user.id == undefined) { //TODO: controlla lo storage per l'id
-        facebook_id = '641892040';
+        facebook_id = '100003916737157';
         $.getJSON(endpoint + "/users", {
             facebook_id: facebook_id
         }, function(data) {
@@ -116,22 +116,18 @@ function getUrlVars() {
 }
 
 
+function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email){
+    console.log("checking user" + facebook_id);
+    $.get(endpoint+"/users/?facebook_id="+ facebook_id, function(data) {
+        if (data.length<1) {
+            console.log('registering user');
+            $.post(endpoint+'/users', {facebook_id:facebook_id, firstname:firstname, surname:surname,
+            birthdate:birthdate,gender:gender, picture_url:picture_url, email:email});
 
-// function loadUser (url, facebook_id) {
-//   $.ajax({ 
-//          async: false, 
-//          url: url, 
-//          dataType: "json", 
-//          data:{ facebook_id : facebook_id},
-//          success: function(data) {
-//            if (data == true) {                   
-//              $("#picture_url").attr("src", data[0].picture_url);
-//           $("#firstname").html(data[0].name.firstname);
-//           $("#surname").html(data[0].name.surname);
-//           $("#patch_counter").html(data[0].patches.length);
-//           $("#checkin_counter").html(data[0].checkins.length);
-//           return data;
-//            }
-//         }, 
-//     });
-// }
+        } 
+        else {
+            console.log('user' + facebook_id + 'already registered');
+        }
+         $(location).attr('href', 'profile.html');
+    });
+}
