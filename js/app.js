@@ -19,11 +19,12 @@ function displayCheckins(data) {
     var checkins = data.checkins;
     var blocks = ['a', 'b', 'c', 'd'];
     $.each(checkins, function(index, c) {
+        var event_id = c.event._id;
         var event_name = c.event.name;
         var event_poster = c.event.poster_url;
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#checkingrid').append('<div class=' + cls + '> <div><img class=poster src="' + event_poster + '"></div></div>');
+        $('#checkingrid').append('<div class=' + cls + '> <a href="userCheckin.html?id='+event_id+'" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
     });
 }
 
@@ -35,9 +36,10 @@ function displayPatches(data) {
         var patch_name = p.patch.name;
         var patch_image = p.patch.image_url;
         var patch_id = p.patch._id;
+        console.log(patch_id);
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id='+ patch_id + '" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
+        $('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id='+ patch_id + '" data-transition="none" data-ajax="false"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
     });
 }
 
@@ -48,25 +50,34 @@ function displayAllPatches(data){
         var patch_name = p.name;
         var patch_image = p.image_url;
         var patch_id = p._id;
+
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#patchgrid').append('<div class=' + cls + '><a href="patch.html?id='+ patch_id + '" data-transition="none"> <div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div> </div></a></div>');
+        $('#patchgrid').append('<div class=' + cls + '><a href="patch.html?id='+ patch_id + '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div> </div></a></div>');
     });
 }
 
 function displayPatch(data) {
      $('#patchH1').html(data.name);
-     $('#patchContent').empty().append("<img src='" + data.image_url + "' />").append("<p>" + data.description + "</p>");
+     $('#patchContent').html("<img src='" + data.image_url + "' />").append("<p>" + data.description + "</p>");
 
-    // $('#patchDesc').html(data.description);
-    // $('#patchImg').attr('src', data.image_url);
 
 }
+
+function displayCheckin(data) {
+     $('#checkinH1').html(data.name);
+     var poster_big = buildBigImg(data.poster_url);
+     $('#checkinContent').html("<img src='" + poster_big + "' />");
+}
+
 
 
 $('#profile').live('pagebeforecreate', function() { //TODO: carica l'id quando phonegap è pronto
     if (user.id == undefined) { //TODO: controlla lo storage per l'id
         facebook_id = window.localStorage.getItem("pm_facebook_id");
+        if (facebook_id==undefined){ //TODO: elimina
+            facebook_id=641892040;
+        }
         $.getJSON(endpoint + "/users", {
             facebook_id: facebook_id
         }, function(data) {
@@ -100,8 +111,12 @@ $('#patches').live('pageshow', function(event) {
 
 $('#patch').live('pageshow', function(event) {
     var id = getUrlVars()["id"];
-
     $.getJSON(endpoint + '/patches/' +id, displayPatch)
+});
+
+$('#checkin').live('pageshow', function(event) {
+    var id = getUrlVars()["id"];
+    $.getJSON(endpoint + '/events/' +id, displayCheckin);
 });
 
 function getUrlVars() {
@@ -116,6 +131,16 @@ function getUrlVars() {
     return vars;
 }
 
+
+function buildBigImg(src){
+    var components=src.split('.');
+    var result="";
+    for (var i = 0; i < components.length-2; i++) {
+        result += components[i]+".";
+    };
+    result += components[components.length-2]+"_b."+components[components.length-1];
+    return result;
+}
 
 function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email){
     console.log("checking user" + facebook_id);

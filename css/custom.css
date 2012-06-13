@@ -1,3 +1,8 @@
+*{
+	-webkit-touch-callout:none;
+	-webkit-user-select:none;
+}
+
 a:link {
 	color:white;
 	text-decoration:none;
@@ -46,8 +51,11 @@ a:active {
 }
 
 .poster  {
-	width: 75px; 
-	height: 120px; 
+	width: 93%; 
+	height: 100px; 
+	margin: 2px;
+	border: solid white 1px!important;
+
 }
 
 .patch {
@@ -141,7 +149,20 @@ height:53px;
 	max-width: 95%;
 }
 
+
+/*Poster Wall*/
+#checkinContent img{
+	max-width:95%;
+	max-height:85%;
+	border: solid white 2px!important;
+}
+
+#checkinContent {
+	text-align:center;
+}
+
 /*Font*/
+
 @font-face{
 	font-family: 'Lobster Two';
 	src: url('../font/LobsterTwo-Bold.otf');
