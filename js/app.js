@@ -37,7 +37,7 @@ function displayPatches(data) {
         var patch_id = p.patch._id;
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id='+ patch_id + '"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
+        $('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id='+ patch_id + '" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
     });
 }
 
@@ -50,7 +50,7 @@ function displayAllPatches(data){
         var patch_id = p._id;
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#patchgrid').append('<div class=' + cls + '><a href="patch.html?id='+ patch_id + '"> <div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div> </div></a></div>');
+        $('#patchgrid').append('<div class=' + cls + '><a href="patch.html?id='+ patch_id + '" data-transition="none"> <div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div> </div></a></div>');
     });
 }
 
@@ -66,29 +66,30 @@ function displayPatch(data) {
 
 $('#profile').live('pagebeforecreate', function() { //TODO: carica l'id quando phonegap è pronto
     if (user.id == undefined) { //TODO: controlla lo storage per l'id
-        facebook_id = '100003916737157';
+        facebook_id = window.localStorage.getItem("pm_facebook_id");
         $.getJSON(endpoint + "/users", {
             facebook_id: facebook_id
         }, function(data) {
             if (data) {
                 user.id = data[0]._id;
-                populateUser();
+                populateUser(user.id);
             }
         });
     }
     
 });
 
-function populateUser() {
-    $.getJSON(endpoint + "/users/" + user.id, function(data) {
+function populateUser(userid) {
+    console.log(userid);
+    $("#userPatchesLink").attr('href', 'userPatches.html?user=' + userid);
+    $("#userCheckinLink").attr('href', 'userCheckins.html?user=' + userid);
+    $.getJSON(endpoint + "/users/" + userid, function(data) {
         // $("#picture_url").attr("src", data.picture_url);
         $("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
         $("#firstname").html(data.name.firstname);
         $("#surname").html(data.name.surname);
         $("#patch_counter").html(data.patches.length);
         $("#checkin_counter").html(data.checkins.length);
-        $("#userPatchesLink").attr('href', 'userPatches.html?user=' + user.id);
-        $("#userCheckinLink").attr('href', 'userCheckins.html?user=' + user.id);
     });
 }
 
@@ -128,6 +129,8 @@ function registerUser(facebook_id, firstname, surname, birthdate, gender, pictur
         else {
             console.log('user' + facebook_id + 'already registered');
         }
+         window.localStorage.setItem("pm_facebook_id", facebook_id);
          $(location).attr('href', 'profile.html');
+
     });
 }

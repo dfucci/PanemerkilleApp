@@ -42,7 +42,7 @@ $("#connect").live('pageshow', function() { //JQM
 });
 
 $("#fbConnect").live('click', function(e) {
-  console.log('login');
+  $("#connecting").html("<img src='images/loader.gif' alt='loading'>");
   FB.login(
   function(response) {}, {
     scope: "email, user_birthday"
@@ -56,6 +56,7 @@ $("#fbConnect").live('click', function(e) {
   <div data-role="page" data-theme="a" id="connect">
 
     <div data-role="content" data-theme="a" id="connectContent">
+      <div id="connecting"></div>
        <a data-role="button" data-icon="fbConnect" data-theme="b" id="fbConnect">Connect with Facebook</a> 
     <!-- <button onclick="login()">Login</button> -->
     </div>
