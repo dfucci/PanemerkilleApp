@@ -133,13 +133,7 @@ function getUrlVars() {
 
 
 function buildBigImg(src){
-    var components=src.split('.');
-    var result="";
-    for (var i = 0; i < components.length-2; i++) {
-        result += components[i]+".";
-    };
-    result += components[components.length-2]+"_b."+components[components.length-1];
-    return result;
+    return src.substring(0, src.lastIndexOf(".")) + "_b" + src.substring(src.lastIndexOf("."));
 }
 
 function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email){
