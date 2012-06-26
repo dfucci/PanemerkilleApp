@@ -52,23 +52,10 @@ a:active {
 	right:0px;
 	max-height:25px;
 }
-/*.featured{
-	max-width:15px;
-	max-height:15px;
-	margin-left:10px;
-
-
-}
-
-#parties-listview li h3{
-	display: inline;
-}
-#parties-listview li p{
-
-	margin-top:.3em;
-
-}*/
-	/*Profile*/
+ /*Party page*/
+ #party-desc{
+ 	margin-top:15px;
+ }
 
 #profilePictureImg{
 	

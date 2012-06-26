@@ -10,11 +10,16 @@ $('#yourpatches').live('pageshow', function(event) {
     $.getJSON(endpoint + '/users/' + id, displayPatches);
 });
 
-
-
 $('#yourcheckins').live('pageshow', function(event) {
     var id = getUrlVars()["user"];
     $.getJSON(endpoint + '/users/' + id, displayCheckins);
+});
+
+$('#btnCheckin').live('tap', function(event) {
+    var eventid = getUrlVars()['id'];
+    $.post(endpoint+'/users/'+user.id+'/checkins', {event: eventid}, function(data) {
+        console.log('checkin executed');
+    });
 });
 
 function displayParties(data) { //TODO: refactor
@@ -34,7 +39,7 @@ function displayParties(data) { //TODO: refactor
         }
         if (isToday(sTime)) {
             noParty=false;
-            out += "<li><a href='party.html?id='" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name  + featured+"</h3><p>" + party.venue.name + " - "  + sHour + ":" + sMinute +  "</p></a></li>";
+            out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name  + featured+"</h3><p>" + party.venue.name + " - "  + sHour + ":" + sMinute +  "</p></a></li>";
             $('#li-today').after(out);
         } else {
             var today = new Date();
@@ -156,29 +161,24 @@ function populateUser(userid) {
         $("#surname").html(data.name.surname);
         $("#patch_counter").html(data.patches.length);
         $("#checkin_counter").html(data.checkins.length);
-        // var statscheckin = $('#stats-checkin');
-        // var statspatch = $('#stats-patch');
-        // $('#stats-checkin').remove();
-        // $('#stats-patch').remove();
-        // $('#listview-stats').listview('refresh');
-        // $('#listview-stats').append(statscheckin);
-        // $('#listview-stats').append(statspatch);
         $('#listview-stats').listview('refresh');
-
-        // var checkin-link = $('<a />', { href : '#', data-transition:'none', id='userCheckinLink'});
-        // var img-checkin = $('<img />'{src:'images/user-checkins.png', class: 'ui-li-thumb'});
-        // var h3-checkin = $('<h3 />'{html:'Poster Wall'});
-        // var p-checkin = $('<p />'{class:'ui-li-desc', html:'Your Parties'});
-        // var span-checkin = $('<span />'{id:'checkin_counter', class:'ui-li-count', html:'0'});
-        // $("#stats").append(checkin-link);
-        // $('#userCheckinLink').append(span-checkin);
-        // $('#userCheckinLink').append(p-checkin);
-        // $('#userCheckinLink').append(h3-checkin);
-        // $('#userCheckinLink').append(img-checkin);
     });
-
 }
+$('#party').live('pageshow', function(event){
+    var id = getUrlVars()['id'];
+    $.getJSON(endpoint+'/events/' + id, displayParty);
+});
 
+function displayParty(data){
+    $('#party-header h1').html(data.name);
+    $('#posterImg').attr('src', data.poster_url);
+    $('#party-venue').html(data.venue.name);
+    var start = new Date(data.time.start);
+    var end = new Date(data.time.end);
+
+    $('#party-time').html("Next " +dayName(start.getDay())+ " from "+trailingZero(start.getHours())+":"+trailingZero(start.getMinutes()) + " to " + trailingZero(end.getHours()) + ":" + trailingZero(end.getMinutes()));
+    $('#party-desc').html(data.description);
+}
 
 $('#patches').live('pageshow', function(event) {
     $.getJSON(endpoint + '/patches/', displayAllPatches);

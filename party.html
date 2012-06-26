@@ -14,36 +14,34 @@
 </head>
 <body>
 
-  <div data-role="page" data-theme="a">
+  <div data-role="page" data-theme="a" id="party">
 
-    <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="profile">
+    <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="party-header">
       <a data-rel="back" data-icon="back">Back</a>
-      <h1>Pirate Party</h1>
+      <h1></h1>
     </div>
 
     <div data-role="content" data-theme="a">
         <div class="ui-grid-a">
-         <div class="pos-left ui-block-a" > <img id="posterImg" src="images/posters/1.jpg"></div>
+         <div class="pos-left ui-block-a" > <img id="posterImg" src="#"></div>
           <div class="pos-right ui-block-b"><div class="box-padding">
               <input type="checkbox" checked="checked" name="checkbox-0" id="checkbox-fb" data-mini="false" />
                         <label for="checkbox-fb">
                          facebook
-                        </label>
-   
-                
+                        </label>   
             <div class="join-div">
-             <a href="checkin.html"  data-transition="none" data-role="button" data-theme="b">Join!</a>
+             <a href="checkin.html"  data-transition="none" data-role="button" data-theme="b" id="btnCheckin">I am here!</a>
           </div>
         </div>
         </div>
        
          <div class="pos-left ui-block-a">Where</div>
-          <div class="pos-right ui-block-b"><div class="box-padding">The Club</div></div>
+          <div class="pos-right ui-block-b"><div class="box-padding" id="party-venue"></div></div>
 
         
          <div class="pos-left ui-block-a" > When</div>
-          <div class="pos-right ui-block-b"><div class="box-padding">Now until 04:00</div></div>
-
+          <div class="pos-right ui-block-b"><div class="box-padding" id="party-time"></div></div>
+<!-- 
        
          <div class="pos-left ui-block-a" > Why</div>
           <div class="pos-right ui-block-b"><div class="box-padding">To set free the pirate inside you</div></div>
@@ -54,9 +52,9 @@
 
 
          <div class="pos-left ui-block-a" > Details</div>
-          <div class="pos-right ui-block-b"><div class="box-padding">Arrggghhh!!! A Party for all the pirates in town. Bring your eye-patch. Parrots allowed</div></div>
-
+          <div class="pos-right ui-block-b"><div class="box-padding">Arrggghhh!!! A Party for all the pirates in town. Bring your eye-patch. Parrots allowed</div></div> -->
         </div>
+        <p id="party-desc"></p>
     </div>
 
   </div>
