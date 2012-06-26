@@ -22,6 +22,10 @@ a:active {
 	color:white;
 	text-decoration:none;
 } 
+.italic{
+	font-style:italic;
+}
+
 
 #connect{
 	background-image: url("../images/splash_b.jpg");
@@ -41,6 +45,29 @@ a:active {
 	top:200px;
 	left:50%;
 }
+/*Party list*/
+.ui-li .featured{
+	position: absolute;
+	top:0px;
+	right:0px;
+	max-height:25px;
+}
+/*.featured{
+	max-width:15px;
+	max-height:15px;
+	margin-left:10px;
+
+
+}
+
+#parties-listview li h3{
+	display: inline;
+}
+#parties-listview li p{
+
+	margin-top:.3em;
+
+}*/
 	/*Profile*/
 
 #profilePictureImg{

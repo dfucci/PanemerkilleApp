@@ -1,7 +1,9 @@
 //var DEBUG="http://localhost:7777";
 var endpoint = "http://blazing-mist-8758.herokuapp.com";
 var user = {};
-
+$('#parties-page').live('pageshow', function(event) {
+     $.getJSON(endpoint + '/events', displayParties);
+});
 
 $('#yourpatches').live('pageshow', function(event) {
     var id = getUrlVars()["user"];
@@ -15,6 +17,58 @@ $('#yourcheckins').live('pageshow', function(event) {
     $.getJSON(endpoint + '/users/' + id, displayCheckins);
 });
 
+function displayParties(data) { //TODO: refactor
+    var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
+    boilerplate+="<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
+    $('#parties-listview').html(boilerplate);
+    var noParty=true;
+    $.each(data.reverse(), function(index, party) {
+        var out = '';
+        var sTime = new Date(party.time.start);
+        var sHour = trailingZero(sTime.getHours());
+        var sMinute = trailingZero(sTime.getMinutes());
+        var sDay = "Next " + dayName(sTime.getDay());
+        var featured="";
+        if (party.venue.featured) {
+            featured+="<img class='featured' src='images/corner.png'/>";
+        }
+        if (isToday(sTime)) {
+            noParty=false;
+            out += "<li><a href='party.html?id='" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name  + featured+"</h3><p>" + party.venue.name + " - "  + sHour + ":" + sMinute +  "</p></a></li>";
+            $('#li-today').after(out);
+        } else {
+            var today = new Date();
+            var tomorrow = new Date();
+            tomorrow.setDate(today.getDate()+1);
+            if(tomorrow.getDate()==sTime.getDate()){
+                sDay='Tomorrow';
+            }
+            out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb'/><h3>" + party.name+ featured+"</h3><p>" + party.venue.name + " - " + sDay + " " + sHour + ":" + sMinute + " </p></a></li>";
+            $('#li-upcoming').after(out);
+        }
+    });
+        if (noParty) {
+             $('#li-today').after("<li><p  class='italic no-event'>Unfortunately there's nothing going on tonight. </p><p class='italic no-event'>Take some time to sew your patches ;)</p></li>");
+        };
+    $("#parties-listview").listview('refresh');
+}
+
+function trailingZero(time) {
+    if (time < 10) {
+        time = "0" + time;
+    }
+    return time;
+}
+
+function dayName(day) {
+    return dayname= ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day];
+}
+
+function isToday(pDate) {
+    var today = new Date();
+    return ((today.getFullYear() == pDate.getFullYear()) && (today.getMonth() == pDate.getMonth()) && (today.getDate() == pDate.getDate()));
+}
+
 function displayCheckins(data) {
     var checkins = data.checkins;
     var blocks = ['a', 'b', 'c', 'd'];
@@ -24,7 +78,7 @@ function displayCheckins(data) {
         var event_poster = c.event.poster_url;
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#checkingrid').append('<div class=' + cls + '> <a href="userCheckin.html?id='+event_id+'" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
+        $('#checkingrid').append('<div class=' + cls + '> <a href="userCheckin.html?id=' + event_id + '" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
     });
 }
 
@@ -36,14 +90,13 @@ function displayPatches(data) {
         var patch_name = p.patch.name;
         var patch_image = p.patch.image_url;
         var patch_id = p.patch._id;
-        console.log(patch_id);
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id='+ patch_id + '" data-transition="none" data-ajax="false"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
+        $('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '" data-transition="none" data-ajax="false"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
     });
 }
 
-function displayAllPatches(data){
+function displayAllPatches(data) {
     $('#patchgrid').empty();
     var blocks = ['a', 'b', 'c', 'd'];
     $.each(data, function(index, p) {
@@ -53,31 +106,34 @@ function displayAllPatches(data){
 
         var k = index % 4;
         var cls = "ui-block-" + blocks[k];
-        $('#patchgrid').append('<div class=' + cls + '><a href="patch.html?id='+ patch_id + '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div> </div></a></div>');
+        $('#patchgrid').append('<div class=' + cls + '><a href="patch.html?id=' + patch_id + '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div> </div></a></div>');
     });
 }
 
 function displayPatch(data) {
-     $('#patchH1').html(data.name);
-     $('#patchContent').html("<img src='" + data.image_url + "' />").append("<p>" + data.description + "</p>");
+    $('#patchH1').html(data.name);
+    $('#patchContent').html("<img src='" + data.image_url + "' />").append("<p>" + data.description + "</p>");
 
 
 }
 
 function displayCheckin(data) {
-     $('#checkinH1').html(data.name);
-     var poster_big = buildBigImg(data.poster_url);
-     $('#checkinContent').html("<img src='" + poster_big + "' />");
+    $('#checkinH1').html(data.name);
+    var poster_big = buildBigImg(data.poster_url);
+    $('#checkinContent').html("<img src='" + poster_big + "' />");
 }
 
 
-
-$('#profile').live('pagebeforecreate', function() { //TODO: carica l'id quando phonegap è pronto
+// evento originale: 'pagebeforecreate'
+$('#profile').live('pagebeforeshow', function() { 
+    //TODO: carica l'id quando phonegap è pronto
     if (user.id == undefined) { //TODO: controlla lo storage per l'id
         facebook_id = window.localStorage.getItem("pm_facebook_id");
-        if (facebook_id==undefined){ //TODO: elimina
-            facebook_id=641892040;
+        if (facebook_id == undefined) { //TODO: elimina
+            facebook_id = 641892040;
         }
+        console.log(facebook_id);
+}
         $.getJSON(endpoint + "/users", {
             facebook_id: facebook_id
         }, function(data) {
@@ -86,22 +142,41 @@ $('#profile').live('pagebeforecreate', function() { //TODO: carica l'id quando p
                 populateUser(user.id);
             }
         });
-    }
     
+
 });
 
 function populateUser(userid) {
-    console.log(userid);
     $("#userPatchesLink").attr('href', 'userPatches.html?user=' + userid);
     $("#userCheckinLink").attr('href', 'userCheckins.html?user=' + userid);
     $.getJSON(endpoint + "/users/" + userid, function(data) {
-        // $("#picture_url").attr("src", data.picture_url);
+        $("#picture_url").attr("src", data.picture_url);
         $("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
         $("#firstname").html(data.name.firstname);
         $("#surname").html(data.name.surname);
         $("#patch_counter").html(data.patches.length);
         $("#checkin_counter").html(data.checkins.length);
+        // var statscheckin = $('#stats-checkin');
+        // var statspatch = $('#stats-patch');
+        // $('#stats-checkin').remove();
+        // $('#stats-patch').remove();
+        // $('#listview-stats').listview('refresh');
+        // $('#listview-stats').append(statscheckin);
+        // $('#listview-stats').append(statspatch);
+        $('#listview-stats').listview('refresh');
+
+        // var checkin-link = $('<a />', { href : '#', data-transition:'none', id='userCheckinLink'});
+        // var img-checkin = $('<img />'{src:'images/user-checkins.png', class: 'ui-li-thumb'});
+        // var h3-checkin = $('<h3 />'{html:'Poster Wall'});
+        // var p-checkin = $('<p />'{class:'ui-li-desc', html:'Your Parties'});
+        // var span-checkin = $('<span />'{id:'checkin_counter', class:'ui-li-count', html:'0'});
+        // $("#stats").append(checkin-link);
+        // $('#userCheckinLink').append(span-checkin);
+        // $('#userCheckinLink').append(p-checkin);
+        // $('#userCheckinLink').append(h3-checkin);
+        // $('#userCheckinLink').append(img-checkin);
     });
+
 }
 
 
@@ -111,12 +186,12 @@ $('#patches').live('pageshow', function(event) {
 
 $('#patch').live('pageshow', function(event) {
     var id = getUrlVars()["id"];
-    $.getJSON(endpoint + '/patches/' +id, displayPatch)
+    $.getJSON(endpoint + '/patches/' + id, displayPatch)
 });
 
 $('#checkin').live('pageshow', function(event) {
     var id = getUrlVars()["id"];
-    $.getJSON(endpoint + '/events/' +id, displayCheckin);
+    $.getJSON(endpoint + '/events/' + id, displayCheckin);
 });
 
 function getUrlVars() {
@@ -132,24 +207,27 @@ function getUrlVars() {
 }
 
 
-function buildBigImg(src){
+function buildBigImg(src) {
     return src.substring(0, src.lastIndexOf(".")) + "_b" + src.substring(src.lastIndexOf("."));
 }
 
-function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email){
+function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
     console.log("checking user" + facebook_id);
-    $.get(endpoint+"/users/?facebook_id="+ facebook_id, function(data) {
-        if (data.length<1) {
-            console.log('registering user');
-            $.post(endpoint+'/users', {facebook_id:facebook_id, firstname:firstname, surname:surname,
-            birthdate:birthdate,gender:gender, picture_url:picture_url, email:email});
+    $.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
+        if (data.length < 1) {
+            $.post(endpoint + '/users', {
+                facebook_id: facebook_id,
+                firstname: firstname,
+                surname: surname,
+                birthdate: birthdate,
+                gender: gender,
+                picture_url: picture_url,
+                email: email
+            });
 
         } 
-        else {
-            console.log('user' + facebook_id + 'already registered');
-        }
-         window.localStorage.setItem("pm_facebook_id", facebook_id);
-         $(location).attr('href', 'profile.html');
+        window.localStorage.setItem("pm_facebook_id", facebook_id);
+        $(location).attr('href', 'profile.html');
 
     });
 }

@@ -48,9 +48,9 @@
         </div>
       </div>
       <div>
-        <ul data-role="listview" data-theme="a" data-inset="true">
-          <li data-role="list-divider" role="heading">Stats</li>
-          <li data-theme="a">
+        <ul data-role="listview" data-theme="a" data-inset="true" id="listview-stats">
+          <li data-role="list-divider" role="heading" id="stats">Stats</li>
+          <li data-theme="a" id="stats-checkin">
             <a href="#" data-transition="none" id="userCheckinLink">
               <img src="images/user-checkins.png" class=ui-li-thumb>
               <h3 class="ui-li-heading">Poster Wall</h3>
@@ -58,7 +58,7 @@
               <span id="checkin_counter" class="ui-li-count">0</span>
             </a>
           </li>
-          <li data-theme="a">
+          <li data-theme="a" id="stats-patch">
             <a href="#" data-transition="none" id="userPatchesLink">
               <img src="images/footbar-panemerkille-patches.png" class=ui-li-thumb>
               <h3 class="ui-li-heading">Patches</h3>
