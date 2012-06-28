@@ -21,7 +21,6 @@ $('#btnCheckin').live('tap', function(event) {
         console.log('checkin executed');
     });
 });
-
 function displayParties(data) { //TODO: refactor
     var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
     boilerplate+="<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
@@ -30,6 +29,7 @@ function displayParties(data) { //TODO: refactor
     $.each(data.reverse(), function(index, party) {
         var out = '';
         var sTime = new Date(party.time.start);
+        var sEnd = new Date(party.time.end);
         var sHour = trailingZero(sTime.getHours());
         var sMinute = trailingZero(sTime.getMinutes());
         var sDay = "Next " + dayName(sTime.getDay());
@@ -37,7 +37,7 @@ function displayParties(data) { //TODO: refactor
         if (party.venue.featured) {
             featured+="<img class='featured' src='images/corner.png'/>";
         }
-        if (isToday(sTime)) {
+        if ((isToday(sTime)) || (isGoingOn(sTime, sEnd))) {
             noParty=false;
             out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name  + featured+"</h3><p>" + party.venue.name + " - "  + sHour + ":" + sMinute +  "</p></a></li>";
             $('#li-today').after(out);
@@ -72,6 +72,18 @@ function dayName(day) {
 function isToday(pDate) {
     var today = new Date();
     return ((today.getFullYear() == pDate.getFullYear()) && (today.getMonth() == pDate.getMonth()) && (today.getDate() == pDate.getDate()));
+}
+
+function isTomorrow(pDate){
+    var today = new Date();
+    var tomorrow = new Date();
+    tomorrow.setDate(today.getDate()+1);
+    return ((tomorrow.getFullYear() == pDate.getFullYear()) && (tomorrow.getMonth() == pDate.getMonth()) && (tomorrow.getDate() == pDate.getDate()));
+
+}
+function isGoingOn(start, end) {
+    var now = new Date();
+    return ((start<= now)&&(end >= now));
 }
 
 function displayCheckins(data) {
@@ -169,17 +181,105 @@ $('#party').live('pageshow', function(event){
     $.getJSON(endpoint+'/events/' + id, displayParty);
 });
 
+
 function displayParty(data){
     $('#party-header h1').html(data.name);
     $('#posterImg').attr('src', data.poster_url);
     $('#party-venue').html(data.venue.name);
     var start = new Date(data.time.start);
     var end = new Date(data.time.end);
+    var day = '';
+    var sStart = '';
+    var sEnd = '';
+    if(isGoingOn(start, end)) {
+        day = 'Now';
+    } 
+    else if (isToday(start)) {
+        day = 'Today';
+        sStart=' from ' + trailingZero(start.getHours()) + ":"+trailingZero(start.getMinutes());
+    }
+    
+    else if (isTomorrow(start)) {
+        day = 'Tomorrow';
+        sStart=' from ' + trailingZero(start.getHours()) + ":"+trailingZero(start.getMinutes());
 
-    $('#party-time').html("Next " +dayName(start.getDay())+ " from "+trailingZero(start.getHours())+":"+trailingZero(start.getMinutes()) + " to " + trailingZero(end.getHours()) + ":" + trailingZero(end.getMinutes()));
+    } else {
+        day = "Next " + dayName(start.getDay());
+        sStart=' from ' + trailingZero(start.getHours()) + ":"+trailingZero(start.getMinutes());
+
+    }
+    if (isToday(end)) {
+        sEnd = ' until ' + trailingZero(end.getHours()) + ":" + trailingZero(end.getMinutes());
+    }
+    
+    else if (isTomorrow(end)) {
+       sEnd = ' until tomorrow at ' + trailingZero(end.getHours()) + ":" + trailingZero(end.getMinutes());
+
+    } else {
+        endDay = "next " + dayName(end.getDay());
+        sEnd = ' until ' +endDay + " at "+ trailingZero(end.getHours()) + ":" + trailingZero(end.getMinutes());
+
+    }
+    $('#party-time').html("<span id='day'>"+day+"</span>"+sStart+sEnd);
     $('#party-desc').html(data.description);
+    venue = {}; //TODO: refactor
+    venue.lat = data.venue.lat;
+    venue.lon = data.venue.lon;
+    enableCheckinBtn();
 }
 
+function enableCheckinBtn(){
+    var eventID = getUrlVars()['id'];
+    $.getJSON(endpoint+'/users/'+user.id, function(data) {
+        for (var i = 0; i < data.checkins.length; i++) {
+            console.log(data.checkins[i].event._id);
+            if (data.checkins[i].event._id == eventID) {
+                console.log('checked in already');
+                return;
+            }
+        }
+        console.log('not yet checkedin');
+        var day = $('#day').text();
+        if(day != 'Now'){
+            console.log('is not now');
+            return;
+        } 
+        console.log('is now');
+        navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError, {enableHighAccuracy: true});
+    });
+}
+function onGPSSuccess(pos){
+    var myLat = pos.coords.latitude;
+    var myLon = pos.coords.longitude;
+    var distance = haversine(myLon, myLat, venue.lon, venue.lat);
+    console.log(distance);
+    if (distance<=100){
+        console.log('button enabled');
+        $('#btnCheckin').removeClass('ui-disabled');
+    }
+
+}
+function haversine(lon1, lat1, lon2, lat2){
+    var R = 6371; // km
+    var dLat = toRad(lat2-lat1);
+    var dLon = toRad(lon2-lon1);
+    var lat1 = toRad(lat1);
+    var lat2 = toRad(lat2);
+
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c;
+    return d *1000;
+}
+
+function onGPSError(err){
+    console.log(err);
+}
+
+function toRad (deg) {
+    return deg * Math.PI / 180;
+}
 $('#patches').live('pageshow', function(event) {
     $.getJSON(endpoint + '/patches/', displayAllPatches);
 });
