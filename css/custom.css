@@ -52,6 +52,27 @@ a:active {
 	right:0px;
 	max-height:25px;
 }
+
+
+ /*Stream*/
+ .ui-li .text-stream{
+ 	width: 60%;
+ 	font-weight: bold;
+ 	font-size: 1.1em;
+ }
+.ui-li .poster-stream{
+	position: absolute;
+	top:0px;
+	right:0px;
+	height:100%;
+}
+
+.ui-li .profile-stream{
+	height: 100%;
+	width: auto;
+}
+
+
  /*Party page*/
  #party-desc{
  	margin-top:15px;

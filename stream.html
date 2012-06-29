@@ -11,33 +11,44 @@
   <script src="cordova-1.6.0.js"></script>
   <script src="cdv-plugin-fb-connect.js"></script>
   <script src="facebook_js_sdk.js"></script>
-  <script type="text/javascript">
-  
-$("#connect").live('pageshow', function() {
-  console.log('init stream');
-  FB.init({
-    appId: "366089376758944",
-    nativeInterface: CDV.FB,
-    useCachedDialogs: false
-  });
-});
-
-$("#fbConnect").live('click', function(e) {
-  FB.logout(function(response) {
-    console.log('logout');
-    $(location).attr('href', 'connect.html');
-  });
-});
-
-  </script>
+  <script src="js/app.js"></script>
 </head>
 <body>
+  <div data-role="page" data-theme="a" id="stream">
+     <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="streamHeader">
+      <h1>Friends</h1>
+    </div>
+    <div data-role="content" data-theme="a" >
+      <ul data-role="listview" data-inset="true">
+        <li data-icon="false">
+          <a href="#" data-transition="none" id="userPatchesLink">
+            <img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/174237_1300698279_24033187_n.jpg" class="ui-li-thumb profile-stream">
+            <p class="text-stream">Davide checked in at Pirate Party at The Club</p>
+            <p>1 day ago</p>
+            <img src="https://s3-eu-west-1.amazonaws.com/panemerkille/poster3.jpg" class="poster-stream" />
+          </a>
+        </li>
+      </ul>
+    </div>
 
-  <div data-role="page" data-theme="a" id="connect">
-
-    <div data-role="content" data-theme="a" id="connectContent">
-       <a data-role="button" data-icon="fbConnect" data-theme="b" id="fbConnect">Log out</a> 
-    <!-- <button onclick="login()">Login</button> -->
+    <!-- footer -->
+    <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false">
+      <div data-role="navbar">
+        <ul>
+          <li>
+            <a href="#" data-transition="none" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active ui-state-persist"></a>
+          </li>
+          <li>
+            <a href="parties.html" data-transition="none" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="patches.html" data-transition="none" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="profile.html"  data-transition="none" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" ></a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </body>

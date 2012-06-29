@@ -12,7 +12,7 @@
 </head>
 <body>
 
-  <div data-role="page" data-theme="a" class='page-joined'>
+  <div data-role="page" data-theme="a" class='page-joined' id="checkedin-page">
 
     <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="profile">
       <h1>Check-in</h1>
@@ -20,14 +20,13 @@
     </div>
 
     <div data-role="content" data-theme="a">
-<ul data-role="listview">
-         <li> You are at Pirate Party at The Club</li>
-         <li data-role="list-divider">Stats</li>
-          <li class="ui-li ui-li-static  ui-li-has-count ui-li-has-icon"><img src="images/here.png" alt="here" class="ui-li-icon ui-li-thumb">Times at The Club<span class="ui-li-count ui-btn-up-c ui-btn-corner-all">4</span></li>
+<ul data-role="listview" id="liview-checkin">
+         <li> You are at <span class="checkin-event"></span> at <span class="checkin-venue"></span></li>
+          <li>You have been <span id="number-checkins-venue"></span>  at <span class="checkin-venue"></span></li>
 
-          <li class="ui-li ui-li-static  ui-li-has-count ui-li-has-icon"><img src="images/here.png" alt="here" class="ui-li-icon ui-li-thumb">Now at The Pirate Party<span class="ui-li-count ui-btn-up-c ui-btn-corner-all">47</span></li>
+          <!-- <li class="ui-li ui-li-static  ui-li-has-count ui-li-has-icon"><img src="images/here.png" alt="here" class="ui-li-icon ui-li-thumb">Now at <span class="checkin-"></span><span class="ui-li-count ui-btn-up-c ui-btn-corner-all">47</span></li>
 
-           <li class="ui-li ui-li-static  ui-li-has-count ui-li-has-icon"><img src="images/here.png" alt="here" class="ui-li-icon ui-li-thumb">Partied at The Club<span class="ui-li-count ui-btn-up-c ui-btn-corner-all">347</span></li>
+           <li class="ui-li ui-li-static  ui-li-has-count ui-li-has-icon"><img src="images/here.png" alt="here" class="ui-li-icon ui-li-thumb">Partied at <span class="checkin-venue"></span><span class="ui-li-count ui-btn-up-c ui-btn-corner-all">347</span></li>
 
            <li data-role="list-divider">Unlocked patches</li>
            <li class="ui-li ui-li-has-thumb"><a href="#">
@@ -41,7 +40,7 @@
         <img src="images/badges/fan.png" class="ui-li-thumb">
         <h3 class="ui-li-heading">The Club Fan</h3>
         <p class="ui-li-desc">Come over again 5 times to unlock it!</p>
-      </li>
+      </li> -->
         </ul>  
 
     </div>

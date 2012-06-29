@@ -21,6 +21,28 @@ $('#btnCheckin').live('tap', function(event) {
         console.log('checkin executed');
     });
 });
+
+$('#checkedin-page').live('pageshow', function(event){
+    displayCheckinStats();
+});
+
+function displayCheckinStats(){
+    var eventID = getUrlVars()['event'];
+    $(".checkin-event").html(eventObj.name);
+    $(".checkin-venue").html(venueObj.name);
+    $.getJSON(endpoint + '/users/' + user.id, updateCheckinsVenue);
+}
+
+function updateCheckinsVenue(data){
+    var total =0;
+    var allCheckins = data.checkins;
+    for (var i = 0; i < allCheckins.length; i++) {
+        if (allCheckins[i].event.venue==venueObj.id) total++;
+    }
+    if (total==1) $("#number-checkins-venue").html('once');    
+    else $("#number-checkins-venue").html(total + ' times');
+}
+
 function displayParties(data) { //TODO: refactor
     var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
     boilerplate+="<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
@@ -178,6 +200,7 @@ function populateUser(userid) {
 }
 $('#party').live('pageshow', function(event){
     var id = getUrlVars()['id'];
+    $('#btnCheckin').attr('href', 'checkin.html?event='+id);
     $.getJSON(endpoint+'/events/' + id, displayParty);
 });
 
@@ -222,9 +245,14 @@ function displayParty(data){
     }
     $('#party-time').html("<span id='day'>"+day+"</span>"+sStart+sEnd);
     $('#party-desc').html(data.description);
-    venue = {}; //TODO: refactor
-    venue.lat = data.venue.lat;
-    venue.lon = data.venue.lon;
+    venueObj = {}; //TODO: refactor
+    venueObj.lat = data.venue.lat;
+    venueObj.lon = data.venue.lon;
+    venueObj.name = data.venue.name;
+    venueObj.id = data.venue._id;
+
+    eventObj={};
+    eventObj.name = data.name;
     enableCheckinBtn();
 }
 
@@ -251,7 +279,7 @@ function enableCheckinBtn(){
 function onGPSSuccess(pos){
     var myLat = pos.coords.latitude;
     var myLon = pos.coords.longitude;
-    var distance = haversine(myLon, myLat, venue.lon, venue.lat);
+    var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
     console.log(distance);
     if (distance<=100){
         console.log('button enabled');
