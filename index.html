@@ -19,13 +19,16 @@
         FB.init({
           appId: "366089376758944",
           nativeInterface: CDV.FB,
-          useCachedDialogs: false
+          useCachedDialogs: false,
+
         });
         FB.getLoginStatus(function(response) {
           if (response.status == 'connected') {
-            $(location).attr('href','profile.html');
+            console.log('connesso');
+            $(location).attr('href', 'profile.html');
           } else {
-            $(location).attr('href','connect.html');
+             console.log('non connesso');
+             $(location).attr('href', 'connect.html');       
           }
         });
       }
@@ -35,8 +38,7 @@
     }, false);
   </script>
 </head>
-
 <body>
-
+<div data-role='page' data-theme='a'></div>
 </body>
 </html>

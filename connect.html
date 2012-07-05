@@ -16,7 +16,6 @@
 
 FB.Event.subscribe('auth.login', function(response) {
   if (response.authResponse) {
-  
      FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
        registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender,
         response.picture, response.email);
@@ -30,7 +29,8 @@ $("#connect").live('pageshow', function() { //JQM
   FB.init({
     appId: "366089376758944",
     nativeInterface: CDV.FB,
-    useCachedDialogs: false
+    useCachedDialogs: false,
+
   });
 });
 

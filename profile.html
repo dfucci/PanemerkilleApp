@@ -19,7 +19,8 @@
     FB.init({
       appId: "366089376758944",
       nativeInterface: CDV.FB,
-      useCachedDialogs: false
+      useCachedDialogs: false,
+
     });
     FB.logout(function(response){
        $(location).attr('href', 'connect.html');
