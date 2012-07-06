@@ -13,23 +13,6 @@
   <script src="cdv-plugin-fb-connect.js"></script>
   <script src="facebook_js_sdk.js"></script>
   <script src="js/app.js"></script>
-
-  <script type="text/javascript">
-  $('#FBLogout').live('tap', function(){
-    FB.init({
-      appId: "366089376758944",
-      nativeInterface: CDV.FB,
-      useCachedDialogs: false,
-
-    });
-    FB.logout(function(response){
-       $(location).attr('href', 'connect.html');
-    });
-  });
-
-
-
-</script>
 </head>
 <body>
   <div data-role="page" data-theme="a" id='profile'>

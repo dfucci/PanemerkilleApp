@@ -1,6 +1,21 @@
 //var DEBUG="http://localhost:7777";
 var endpoint = "http://blazing-mist-8758.herokuapp.com";
 var user = {};
+
+  $('#FBLogout').live('tap', function(){
+    console.log('bye bye');
+    window.localStorage.clear();
+    FB.init({
+      appId: "366089376758944",
+      nativeInterface: CDV.FB,
+      useCachedDialogs: false,
+
+    });
+    FB.logout(function(response){
+       $(location).attr('href', 'connect.html');
+    });
+  });
+  
 $('#parties-page').live('pageshow', function(event) {
      $.getJSON(endpoint + '/events', displayParties);
 });
@@ -27,50 +42,22 @@ $('#checkedin-page').live('pageshow', displayCheckinStats);
 $('#stream').live('pageshow', displayStream);
 
 function displayStream(toPage, options) {
-    console.log('inizia');
-    FB.init({
-        appId: "366089376758944",
-        nativeInterface: CDV.FB,
-        useCachedDialogs: false,
+    $.getJSON(endpoint + "/users/" + user.id + "/friends", function(friends){
+        $("#streamContent").empty();
+        for (var i = 0; i < friends.length; i++) {
+            var output='';
+            output+='<ul data-role="listview" data-inset="true" id="listview-stream'+i+'"><li data-icon="false"><a href="#" data-transition="none">';
+            output+='<img src="'+friends[i].picture_url+'" class="ui-li-thumb profile-stream"/>';
+            output+='<p class="text-stream">'+friends[i].name.firstname+'</p>'
+            output+='<p class="text-stream">'+friends[i].checkins[0].event.name+'</p>';
+            output+='<p class="day-stream">'+friends[i].checkins[0].timestamp+'</p>';
+            output+='<img src="'+friends[i].checkins[0].event.poster_url+'" class="poster-stream"/>';
+            output+='</a></li></ul>';
+            $('#streamContent').append(output);
+            $('#listview-stream'+i).listview();
+        }
+
     });
-    FB.getLoginStatus(function(response) {
-        console.log('getLogin');
-        if (response.status == 'connected') {
-            var pmFriends = new Array();
-            console.log(response.authResponse.expiresIn);
-            FB.api('/me/friends',{fields: 'installed'}, function(res) {
-                if (res.error) console.log(res.error);
-                else{
-                console.log('facebook callback');
-                console.log(res.data);
-                for (var i = 0; i < res.data.length; i++) {
-                    if (typeof res.data[i].installed != "undefined") {
-                        console.log('trovato');
-                        pmFriends.push(res.data[i]);
-                    }
-                }
-                var friendsParameter = JSON.stringify(pmFriends);
-
-                // $.ajax({
-                //     url:endpoint+"/users/"+ user.id + "/friends",
-                //     type:"POST",
-                //     data: {friends:friendsParameter}
-                // });
-                console.log(friendsParameter);
-                $.post(endpoint+"/users/"+ user.id + "/friends", {friends:friendsParameter}, function(data){
-                    console.log(data);
-                });
-                // response.data.forEach(function(item) {
-                //     if (typeof item.installed != "undefined") {
-                //         pmFriends.push(item.id);
-                //         console.log(item);
-                //     }
-                // });
-                }
-            });
-
-        } else console.log(response.status);
-    }, true);
 }
 
 
@@ -212,27 +199,44 @@ function displayCheckin(data) {
 }
 
 
+$('#profile').live('pagebeforeshow', function(){
+    populateUser(user.id);
+});
 // evento originale: 'pagebeforecreate'
-$('#profile').live('pagebeforeshow', function() { 
-    //TODO: carica l'id quando phonegap è pronto
-    if (user.id == undefined) { //TODO: controlla lo storage per l'id
-        facebook_id = window.localStorage.getItem("pm_facebook_id");
-        if (facebook_id == undefined) { //TODO: elimina
-            facebook_id = 641892040;
-        }
-        console.log(facebook_id);
-}
-        $.getJSON(endpoint + "/users", {
-            facebook_id: facebook_id
-        }, function(data) {
-            if (data) {
-                user.id = data[0]._id;
-                populateUser(user.id);
-            }
-        });
+// $('#profile').live('pagebeforeshow', function() { 
+//     //TODO: carica l'id quando phonegap è pronto
+//     if (user.id == undefined) { //TODO: controlla lo storage per l'id
+//         facebook_id = window.localStorage.getItem("pm_facebook_id");
+//         if (facebook_id == undefined) { //TODO: elimina
+//             facebook_id = 641892040;
+//         }
+//         console.log(facebook_id);
+// }
+//         $.getJSON(endpoint + "/users", {
+//             facebook_id: facebook_id
+//         }, function(data) {
+//             if (data) {
+//                 //user.id = data[0]._id;
+//                 populateUser(user.id);
+//             }
+//         });
     
 
-});
+// });
+
+
+function isUserInStorage(){
+    // var facebook_id = window.localStorage.getItem("pm_facebook_id");
+    var user_id = window.localStorage.getItem("pm_user_id");
+    console.log('checkin user' + user_id);
+    return user_id!=null;
+    
+}
+
+function saveUserStorage(user_id){
+    // window.localStorage.setItem("pm_facebook_id", facebook_id);
+    window.localStorage.setItem("pm_user_id", user_id);
+}
 
 function populateUser(userid) {
     $("#userPatchesLink").attr('href', 'userPatches.html?user=' + userid);
@@ -303,6 +307,7 @@ function displayParty(data){
     eventObj={};
     eventObj.name = data.name;
     enableCheckinBtn();
+    $("input[type='checkbox']").checkboxradio('disable');
 }
 
 function enableCheckinBtn(){
@@ -333,6 +338,7 @@ function onGPSSuccess(pos){
     if (distance<=100){
         console.log('button enabled');
         $('#btnCheckin').removeClass('ui-disabled');
+        $("input[type='checkbox']").checkboxradio('enable');
     }
 
 }
@@ -404,7 +410,7 @@ function registerUser(facebook_id, firstname, surname, birthdate, gender, pictur
 
         } 
         window.localStorage.setItem("pm_facebook_id", facebook_id);
-        $(location).attr('href', 'profile.html');
+        $(location).attr('href', 'index.html');
 
     });
 }

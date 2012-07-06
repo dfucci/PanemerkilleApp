@@ -13,29 +13,51 @@
   <script src="cdv-plugin-fb-connect.js"></script>
   <script src="facebook_js_sdk.js"></script>
   <script type="text/javascript">
-    document.addEventListener('deviceready', function() { //PhoneGap
-      console.log('init');
-      try {
-        FB.init({
-          appId: "366089376758944",
-          nativeInterface: CDV.FB,
-          useCachedDialogs: false,
+  document.addEventListener('deviceready', init, false);
+  // document.addEventListener('load', init);
 
-        });
-        FB.getLoginStatus(function(response) {
-          if (response.status == 'connected') {
-            console.log('connesso');
-            $(location).attr('href', 'profile.html');
+  function init() {
+    console.log('init');
+    try {
+      FB.init({
+        appId: "366089376758944",
+        nativeInterface: CDV.FB,
+        useCachedDialogs: false,
+
+      });
+      FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+          console.log('connesso');
+         var facebook_id = window.localStorage.getItem("pm_facebook_id");
+         console.log(facebook_id);
+          if (!isUserInStorage()) {
+            console.log('user not in storage');
+            $.getJSON(endpoint + "/users", {
+              facebook_id: facebook_id
+            }, function(data) {
+              if (data) {
+                user.id = data[0]._id;
+                console.log(user.id);
+                saveUserStorage(user.id);
+                $.mobile.changePage('parties.html');
+                // $(location).attr('href', 'parties.html');
+              }
+            });
           } else {
-             console.log('non connesso');
-             $(location).attr('href', 'connect.html');       
+            user.id=window.localStorage.getItem("pm_user_id");    
+            console.log('user in storage' + user.id);
+            // $(location).attr('href', 'parties.html');
+            $.mobile.changePage('parties.html');
           }
-        });
-      }
-     catch (e) {
+        } else {
+          console.log('non connesso');
+          $(location).attr('href', 'connect.html');
+        }
+      });
+    } catch (e) {
       alert(e);
     }
-    }, false);
+  }
   </script>
 </head>
 <body>

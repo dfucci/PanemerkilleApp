@@ -58,8 +58,12 @@ a:active {
  .ui-li .text-stream{
  	width: 60%;
  	font-weight: bold;
- 	font-size: 1.1em;
+ 	font-size: 0.7em;
  }
+
+.day-stream{
+	margin-top: 20px
+}
 .ui-li .poster-stream{
 	position: absolute;
 	top:0px;
