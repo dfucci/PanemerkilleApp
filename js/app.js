@@ -18,6 +18,7 @@ var user = {};
   
 $('#parties-page').live('pageshow', function(event) {
      $.getJSON(endpoint + '/events', displayParties);
+     populateUserFriends();
 });
 
 $('#yourpatches').live('pageshow', function(event) {
@@ -251,6 +252,41 @@ function populateUser(userid) {
         $('#listview-stats').listview('refresh');
     });
 }
+
+function populateUserFriends() {
+    console.log('populateUserFriends');
+    FB.init({
+        appId: "366089376758944",
+        nativeInterface: CDV.FB,
+        useCachedDialogs: false,
+    });
+    FB.getLoginStatus(function(response) {
+        if (response.status == 'connected') {
+            var pmFriends = new Array();
+            FB.api('/me/friends', {
+                fields: 'installed'
+            }, function(res) {
+                if (res.error) console.log(res.error);
+                else {
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (typeof res.data[i].installed != "undefined") {
+                            console.log('trovato');
+                            pmFriends.push(res.data[i]);
+                        }
+                    }
+                    var friendsParameter = JSON.stringify(pmFriends);
+                    $.post(endpoint + "/users/" + user.id + "/friends", {
+                        friends: friendsParameter
+                    }, function(data) {
+                        console.log(data);
+                    });
+                }
+            });
+
+        } else console.log(response.status);
+    }, true);
+}
+
 $('#party').live('pageshow', function(event){
     var id = getUrlVars()['id'];
     $('#btnCheckin').attr('href', 'checkin.html?event='+id);
