@@ -15,7 +15,10 @@ $('#FBLogout').live('tap', function() {
 		$(location).attr('href', 'connect.html');
 	});
 });
-
+$('#btn-claimed').live('tap', function(){
+	$(this).toggle();
+	//TODO: POST user.checkins.claimed = true
+});
 $('#parties-page').live('pageshow', function(event) {
 	$.getJSON(endpoint + '/events', displayParties);
 	populateUserFriends();
@@ -283,8 +286,13 @@ function displayAllPatches(data) {
 
 function displayPatch(data) {
 	$('#patchH1').html(data.name);
-	$('#patchContent').html("<img id='singlepatch' src='" + data.image_url + "' />").append(
-			"<p>" + data.description + "</p>");
+	var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
+	$('#patchContent').html(output);
+	if (!data.claimed) {
+		$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
+		$('#btn-claimed').button();
+	}
+
 
 }
 
@@ -391,6 +399,7 @@ $('#party').live('pageshow', function(event) {
 });
 
 function displayParty(data) {
+	$("input[type='checkbox']").checkboxradio('disable');
 	$('#party-header h1').html(data.name);
 	$('#posterImg').attr('src', data.poster_url);
 	$('#party-venue').html(data.venue.name);
@@ -450,7 +459,6 @@ function displayParty(data) {
 	eventObj = {};
 	eventObj.name = data.name;
 	enableCheckinBtn();
-	$("input[type='checkbox']").checkboxradio('disable');
 }
 
 function enableCheckinBtn() {
