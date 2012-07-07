@@ -105,6 +105,18 @@ a:active {
 	width: 60px; 
 	height:auto;
 }
+
+.locked {
+	opacity: 0.3;
+}
+
+#singlepatch{
+	max-width:90%;
+	max-height:90%;
+
+}
+
+
 #FBLogout {
 	margin-top: 25px;
 }

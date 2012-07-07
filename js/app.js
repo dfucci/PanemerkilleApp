@@ -229,34 +229,58 @@ function displayPatches(data) {
 }
 
 function displayAllPatches(data) {
+	
+	
 	$('#patchgrid').empty();
 	var blocks = [ 'a', 'b', 'c', 'd' ];
+	
+	
+	$.getJSON(endpoint + "/users/" + user.id, function(user) {
+				userPatches = new Array();
+				for ( var int = 0; int < user.patches.length; int++) {
+					var patch = user.patches[int]._id;
+					userPatches.push(patch);		
+				}
+				console.log(userPatches);
+				
+				$.each(
+						data,
+						function(index, p) {
+							var patch_name = p.name;
+							var patch_image = p.image_url;
+							var patch_id = p._id;
+							var opaque ="";
+							var k = index % 4;
+							var cls = "ui-block-" + blocks[k];
+							if ($.inArray( p._id, userPatches )==-1)
+								opaque += " locked";
+									
+							$('#patchgrid')
+									.append(
+											'<div class="'
+													+ cls
+													+ '"><a href="patch.html?id='
+													+ patch_id
+													+ '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg'+opaque+'" src="'
+													+ patch_image + '"/><div class="patchName'+opaque+'">'
+													+ patch_name
+													+ '</div> </div></a></div>');
+						});
+				
+				
+				
+				
+				
+			});
+	
+	
 	$
-			.each(
-					data,
-					function(index, p) {
-						var patch_name = p.name;
-						var patch_image = p.image_url;
-						var patch_id = p._id;
 
-						var k = index % 4;
-						var cls = "ui-block-" + blocks[k];
-						$('#patchgrid')
-								.append(
-										'<div class='
-												+ cls
-												+ '><a href="patch.html?id='
-												+ patch_id
-												+ '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg" src="'
-												+ patch_image + '"><div>'
-												+ patch_name
-												+ '</div> </div></a></div>');
-					});
 }
 
 function displayPatch(data) {
 	$('#patchH1').html(data.name);
-	$('#patchContent').html("<img src='" + data.image_url + "' />").append(
+	$('#patchContent').html("<img id='singlepatch' src='" + data.image_url + "' />").append(
 			"<p>" + data.description + "</p>");
 
 }
