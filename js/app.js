@@ -238,7 +238,7 @@ function displayAllPatches(data) {
 	$.getJSON(endpoint + "/users/" + user.id, function(user) {
 				userPatches = new Array();
 				for ( var int = 0; int < user.patches.length; int++) {
-					var patch = user.patches[int]._id;
+					var patch = user.patches[int].patch._id;
 					userPatches.push(patch);		
 				}
 				console.log(userPatches);
@@ -250,18 +250,21 @@ function displayAllPatches(data) {
 							var patch_image = p.image_url;
 							var patch_id = p._id;
 							var opaque ="";
+							var href = 'patch.html?id='+ patch_id;
 							var k = index % 4;
 							var cls = "ui-block-" + blocks[k];
-							if ($.inArray( p._id, userPatches )==-1)
-								opaque += " locked";
+							if ($.inArray( p._id, userPatches )==-1){
+								href = "#" ;
+								opaque += " locked";		
+							}
+								
+							
 									
 							$('#patchgrid')
 									.append(
 											'<div class="'
 													+ cls
-													+ '"><a href="patch.html?id='
-													+ patch_id
-													+ '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg'+opaque+'" src="'
+													+ '"><a href="'+href+'" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg'+opaque+'" src="'
 													+ patch_image + '"/><div class="patchName'+opaque+'">'
 													+ patch_name
 													+ '</div> </div></a></div>');
