@@ -47,11 +47,12 @@ function displayStream(toPage, options) {
         $("#streamContent").empty();
         for (var i = 0; i < friends.length; i++) {
             var output='';
-            output+='<ul data-role="listview" data-inset="true" id="listview-stream'+i+'"><li data-icon="false"><a href="#" data-transition="none">';
+            var myTime = $.timeago(friends[i].checkins[0].timestamp);
+            output+='<ul data-role="listview" data-inset="true" id="listview-stream'+i+'"><li data-icon="false"><a href="party.html?id='+friends[i].checkins[0].event._id+'" data-transition="none">';
             output+='<img src="'+friends[i].picture_url+'" class="ui-li-thumb profile-stream"/>';
             output+='<p class="text-stream">'+friends[i].name.firstname+'</p>'
             output+='<p class="text-stream">'+friends[i].checkins[0].event.name+'</p>';
-            output+='<p class="day-stream">'+friends[i].checkins[0].timestamp+'</p>';
+            output+='<p class="day-stream">'+myTime+'</p>';
             output+='<img src="'+friends[i].checkins[0].event.poster_url+'" class="poster-stream"/>';
             output+='</a></li></ul>';
             $('#streamContent').append(output);
@@ -303,7 +304,12 @@ function displayParty(data){
     var day = '';
     var sStart = '';
     var sEnd = '';
-    if(isGoingOn(start, end)) {
+    var now = new Date();
+    if(end<now){ //TODO: usa switch o qualcosa
+        console.log('party over');
+        sEnd=$.timeago(end);
+    } else {
+     if(isGoingOn(start, end)) {
         day = 'Now';
     } 
     else if (isToday(start)) {
@@ -315,7 +321,7 @@ function displayParty(data){
         day = 'Tomorrow';
         sStart=' from ' + trailingZero(start.getHours()) + ":"+trailingZero(start.getMinutes());
 
-    } else {
+    } else { 
         day = "Next " + dayName(start.getDay());
         sStart=' from ' + trailingZero(start.getHours()) + ":"+trailingZero(start.getMinutes());
 
@@ -332,6 +338,7 @@ function displayParty(data){
         sEnd = ' until ' +endDay + " at "+ trailingZero(end.getHours()) + ":" + trailingZero(end.getMinutes());
 
     }
+}
     $('#party-time').html("<span id='day'>"+day+"</span>"+sStart+sEnd);
     $('#party-desc').html(data.description);
     venueObj = {}; //TODO: refactor
