@@ -414,6 +414,17 @@ function enableCheckinBtn() {
 				$('#party-error').show();
 				return;
 			}
+		} 
+		var lastCheckin = moment(data.checkins[data.checkins.length-1].timestamp);
+		var now = moment();
+		var diff = now.diff(lastCheckin,'minutes');
+		console.log('the diff is ' + diff);
+		var interval= moment.duration(120, 'minutes');
+		if (diff<120) {
+			var result = lastCheckin.add('minutes', 120).fromNow();
+			$('#party-error').html('You have already checked in somewhere else recentely. Try again  ' + result);
+			$('#party-error').show();
+			return
 		}
 		console.log('not yet checkedin');
 		var day = $('#day').text();
