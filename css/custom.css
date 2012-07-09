@@ -78,6 +78,11 @@ a:active {
 
 
  /*Party page*/
+ #party-error{
+ 	font-size: 0.8em;
+ 	display: none;
+ 	font-style: italic;
+ }
  #party-desc{
  	margin-top:15px;
  }

@@ -38,7 +38,7 @@ $("#fbConnect").live('click', function(e) {
   $("#connecting").html("<img src='images/loader.gif' alt='loading'>");
   FB.login(
   function(response) {}, {
-    scope: "email, user_birthday"
+    scope: "email, user_birthday, publish_actions, publish_stream"
   });
 });
 

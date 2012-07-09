@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Profile</title>
+  <title>Party</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="css/jquery.mobile.css" />
@@ -25,7 +25,7 @@
         <div class="ui-grid-a">
          <div class="pos-left ui-block-a" > <img id="posterImg" src="#"></div>
           <div class="pos-right ui-block-b"><div class="box-padding">
-              <input type="checkbox" checked="checked" name="checkbox-0" id="checkbox-fb" data-mini="false" />
+              <input type="checkbox" checked="checked" name="checkbox-0" id="checkbox-fb" data-mini="false" disabled="true" />
                         <label for="checkbox-fb">
                          facebook
                         </label>   
@@ -44,7 +44,7 @@
         </div>
         <p id="party-desc"></p>
     </div>
-
+<div data-role="footer" data-position="fixed" id="party-error" class="ui-bar"></div>
   </div>
 </body>
 </html>
