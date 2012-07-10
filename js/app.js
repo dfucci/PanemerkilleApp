@@ -196,7 +196,7 @@ function displayPatches(data) {
 		var patch_id = p.patch._id;
 		var k = index % 4;
 		var cls = "ui-block-" + blocks[k];
-		$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '" data-transition="none" data-ajax="false"><div class="patch"><img class="patchImg" src="' + patch_image + '"><div>' + patch_name + '</div></div></a></div>');
+		$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '" data-transition="none" data-ajax="false"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
 	});
 }
 
@@ -228,10 +228,7 @@ function displayAllPatches(data) {
 				href = "#";
 				opaque += " locked";
 			}
-
-
-
-			$('#patchgrid').append('<div class="' + cls + '"><a href="' + href + '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/><div class="patchName' + opaque + '">' + patch_name + '</div> </div></a></div>');
+			$('#patchgrid').append('<div class="' + cls + '"><a href="' + href + '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/></div></a></div>');
 		});
 
 
@@ -308,8 +305,14 @@ function populateUser(userid) {
 		$("#patch_counter").html(data.patches.length);
 		$("#checkin_counter").html(data.checkins.length);
 		$('#listview-stats').listview('refresh');
+		$("#profilePictureImg").cropresize({
+			height:100,
+			width:100,
+			vertical:'top'
+		});
 	});
 }
+
 
 function populateUserFriends() {
 	console.log('populateUserFriends');
@@ -401,6 +404,26 @@ function displayParty(data) {
 	eventObj = {};
 	eventObj.name = data.name;
 	enableCheckinBtn();
+	displayPartyAttenders(data.attenders);
+}
+
+function displayPartyAttenders(attenders){
+	$('#attenders').empty();
+	var blocks = ['a', 'b', 'c', 'd'];
+	for (var i = 0; i < attenders.length; i++) {
+		var attenderImg = attenders[i].attender.picture_url;
+		var col = i%4;
+		var cls = 'ui-block-' + blocks[col];
+		var output='<div class="'+cls+'">';
+		output+='<img class="attenderImg" src="'+attenderImg+'"/>'
+		output+='</div>';
+		$('#attenders').append(output);
+		$('#attenders img').cropresize({
+			width:65,
+     		height:65,
+      		vertical:"top"
+		});
+	}
 }
 
 function enableCheckinBtn() {
