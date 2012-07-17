@@ -187,6 +187,7 @@ function displayCheckins(data) {
 
 function displayPatches(data) {
 	var patches = data.patches;
+	console.log(patches);
 	var blocks = ['a', 'b', 'c', 'd'];
 	$('#patchgrid').empty();
 	$.each(
