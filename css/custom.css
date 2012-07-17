@@ -126,6 +126,24 @@ a:active {
 
 #FBLogout {
 	margin-top: 25px;
+	border:1px solid #6B1A22;
+	background:#6B1A22;
+	text-shadow:0 1px 1px #6B1A22;
+	background-image: linear-gradient(bottom, #6B1A22 26%, #C92828 82%);
+	background-image: -o-linear-gradient(bottom, #6B1A22 26%, #C92828 82%);
+	background-image: -moz-linear-gradient(bottom, #6B1A22 26%, #C92828 82%);
+	background-image: -webkit-linear-gradient(bottom, #6B1A22 26%, #C92828 82%);
+	background-image: -ms-linear-gradient(bottom, #6B1A22 26%, #C92828 82%);
+	
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.26, #6B1A22),
+		color-stop(0.82, #C92828)
+	);
+	
+	
 }
 /*Custom Icons*/
 .ui-icon-fbConnect{
