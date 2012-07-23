@@ -30,7 +30,7 @@
       FB.getLoginStatus(function(response) {
         if (response.status === 'connected') {
           console.log('connesso');
-         var facebook_id = window.localStorage.getItem("pm_facebook_id");
+         var facebook_id = response.authResponse.userID;
          console.log(facebook_id);
           if (!isUserInStorage()) {
             console.log('user not in storage');
