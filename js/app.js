@@ -15,9 +15,18 @@ $('#FBLogout').live('tap', function() {
 		$(location).attr('href', 'connect.html');
 	});
 });
+
 $('#btn-claimed').live('tap', function() {
-	$(this).toggle();
+	var patch = getUrlVars()["id"];
 	//TODO: POST user.checkins.claimed = true
+	$.post(endpoint + '/users/' + user.id + "/patches/" + patch, {
+					claimed: 'true'
+				}, function(data){
+					if (data){
+
+						$("#btn-claimed").toggle();
+					}
+				});
 });
 $('#parties-page').live('pageshow', function(event) {
 	$.getJSON(endpoint + '/events', displayParties);
@@ -197,7 +206,7 @@ function displayPatches(data) {
 		var patch_id = p.patch._id;
 		var k = index % 4;
 		var cls = "ui-block-" + blocks[k];
-		$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '" data-transition="none" data-ajax="false"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
+		$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '&claimed='+p.claimed+'" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
 	});
 }
 
@@ -229,7 +238,7 @@ function displayAllPatches(data) {
 				href = "#";
 				opaque += " locked";
 			}
-			$('#patchgrid').append('<div class="' + cls + '"><a href="' + href + '" data-transition="none" data-ajax="false> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/></div></a></div>');
+			$('#patchgrid').append('<div class="' + cls + '"><a href="' + href + '" data-transition="none"> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/></div></a></div>');
 		});
 
 
@@ -245,6 +254,7 @@ function displayPatch(data) {
 	$('#patchH1').html(data.name);
 	var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
 	$('#patchContent').html(output);
+	console.log(data);
 	if (!data.claimed) {
 		$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
 		$('#btn-claimed').button();
@@ -507,9 +517,31 @@ $('#patches').live('pageshow', function(event) {
 	$.getJSON(endpoint + '/patches/', displayAllPatches);
 });
 
-$('#patch').live('pageshow', function(event) {
-	var id = getUrlVars()["id"];
-	$.getJSON(endpoint + '/patches/' + id, displayPatch)
+// $('#patch').live('pageshow', function(event) {
+// 	var id = getUrlVars()["id"];
+// 	$.getJSON(endpoint + '/patches/' + id, displayPatch)
+// });
+
+$('#patch').live('pageshow', function(event, data) {
+	var hashes = $(this).data("url").split("?")[1].split('&'); //TODO: check 2 parameters.
+	var vars = [];
+	for (var i = 0; i < hashes.length; i++) {
+		hash = hashes[i].split('=');
+		//vars.push(hash[0]);
+		vars[hash[0]] = hash[1];
+	}
+	var patch = vars['id'];
+	var claimed = vars['claimed'];
+	$.getJSON(endpoint + '/patches/' + patch, function(data){
+		$('#patchH1').html(data.name);
+		var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
+		$('#patchContent').html(output);
+		if (claimed=='false') {
+			console.log('bottone');
+			$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
+			$('#btn-claimed').button();
+	}
+	});
 });
 
 $('#checkin').live('pageshow', function(event) {
@@ -524,7 +556,7 @@ function getUrlVars() {
 	window.location.href.indexOf('?') + 1).split('&');
 	for (var i = 0; i < hashes.length; i++) {
 		hash = hashes[i].split('=');
-		vars.push(hash[0]);
+		//vars.push(hash[0]);
 		vars[hash[0]] = hash[1];
 	}
 	return vars;
