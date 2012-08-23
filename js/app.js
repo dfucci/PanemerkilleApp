@@ -1,4 +1,4 @@
-//var DEBUG="http://localhost:7777";
+ //var DEBUG="http://localhost:7777";
 var endpoint = "http://blazing-mist-8758.herokuapp.com";
 var user = {};
 
@@ -210,7 +210,7 @@ function displayPatches(data) {
 	});
 }
 
-function displayAllPatches(data) {
+function displayAllPatches(patches) {
 
 
 	$('#patchgrid').empty();
@@ -220,23 +220,27 @@ function displayAllPatches(data) {
 	$.getJSON(endpoint + "/users/" + user.id, function(user) {
 		userPatches = new Array();
 		for (var int = 0; int < user.patches.length; int++) {
-			var patch = user.patches[int].patch._id;
+			var patch = {id: user.patches[int].patch._id, claimed: user.patches[int].claimed};
 			userPatches.push(patch);
 		}
 		console.log(userPatches);
 
+		var patches_ids= $.map(userPatches, function(o) { return o["id"]; });
+		var count =0;
 		$.each(
-		data, function(index, p) {
+		patches, function(index, p) {
 			var patch_name = p.name;
 			var patch_image = p.image_url;
 			var patch_id = p._id;
 			var opaque = "";
-			var href = 'patch.html?id=' + patch_id;
 			var k = index % 4;
 			var cls = "ui-block-" + blocks[k];
-			if ($.inArray(p._id, userPatches) == -1) {
+			if ($.inArray(p._id, patches_ids) == -1) {
 				href = "#";
 				opaque += " locked";
+			} else{
+				var href = 'patch.html?id=' + patch_id + '&claimed=' + userPatches[count].claimed;
+				count++;
 			}
 			$('#patchgrid').append('<div class="' + cls + '"><a href="' + href + '" data-transition="none"> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/></div></a></div>');
 		});
@@ -443,7 +447,6 @@ function enableCheckinBtn() {
 		for (var i = 0; i < data.checkins.length; i++) {
 			console.log(data.checkins[i].event._id);
 			if (data.checkins[i].event._id == eventID) { //check if the user checked in at the same event
-				console.log('checked in already');
 				$('#party-error').html('You have already checked in here.');
 				$('#party-error').show();
 				return;
@@ -452,7 +455,6 @@ function enableCheckinBtn() {
 		var lastCheckin = moment(data.checkins[data.checkins.length-1].timestamp);
 		var now = moment();
 		var diff = now.diff(lastCheckin,'minutes');
-		console.log('the diff is ' + diff);
 		var interval= moment.duration(120, 'minutes');
 		if (diff<120) {
 			var result = lastCheckin.add('minutes', 120).fromNow();
@@ -460,15 +462,13 @@ function enableCheckinBtn() {
 			$('#party-error').show();
 			return
 		}
-		console.log('not yet checkedin');
+
 		var day = $('#day').text();
 		if (day != 'Now') { //event has not started yet
-			console.log('is not now');
 			$('#party-error').html('This is not happening now.');
 			$('#party-error').show();
 			return;
 		}
-		console.log('is now');
 		navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError, {
 			enableHighAccuracy: true
 		});
@@ -479,9 +479,7 @@ function onGPSSuccess(pos) {
 	var myLat = pos.coords.latitude;
 	var myLon = pos.coords.longitude;
 	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
-	console.log(distance);
 	if (distance <= 100) {
-		console.log('button enabled');
 		$('#btnCheckin').removeClass('ui-disabled');
 		$("input[type='checkbox']").checkboxradio('enable');
 	} else{
@@ -537,7 +535,6 @@ $('#patch').live('pageshow', function(event, data) {
 		var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
 		$('#patchContent').html(output);
 		if (claimed=='false') {
-			console.log('bottone');
 			$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
 			$('#btn-claimed').button();
 	}
