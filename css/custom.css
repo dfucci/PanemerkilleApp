@@ -102,7 +102,13 @@ a:active {
 
 }
 
+#patch-back {
+	display:none;
+}
 
+#patch-done {
+	display:none;
+}
 .patch {
 	text-align: center;
 }
