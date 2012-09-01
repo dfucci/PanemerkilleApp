@@ -12,18 +12,16 @@
   <script src="js/app.js"></script>
 </head>
 <body>
-  <div data-role="page" data-theme="a" id="patch">
 
-    <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="profile">
-      <a id="patch-back" data-rel="back" data-icon="back">Back</a>
-      <h1 id="patchH1">Patch</h1>
-      <a id="patch-done" href="profile.html" data-icon="check" class="ui-btn-right" data-theme="b">Done</a>
+  <div data-role="dialog" data-overlay-theme="a" id="patch-confirm">
+    <div data-role="header" data-theme="b">
+     <h1>Claiming</h1>
     </div>
-
-    <div data-role="content" data-theme="a" id="patchContent">
-     
+    <div data-role="content" data-theme="a">
+    <p>Have you received your (awsome) patch?</p>
+    <a data-role="button"  href="profile.html" data-theme="b" id="btn-claimed">Yes, I have it!</a>
+    <a data-role="button" data-rel="back" id="cancel-confirm-patch" data-theme="b">No, I'll do it later</a>
     </div>
-
   </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
  //var DEBUG="http://localhost:7777";
- var endpoint = "http://blazing-mist-8758.herokuapp.com";
+ var endpoint = "http://panemerkille.herokuapp.com";
  var user = {};
  var eventObj = {};
  var venueObj = {}; // TODO: refactor
@@ -22,11 +22,6 @@
  	//TODO: POST user.checkins.claimed = true
  	$.post(endpoint + '/users/' + user.id + "/patches/" + patch, {
  		claimed: 'true'
- 	}, function(data) {
- 		if (data) {
-
- 			$("#btn-claimed").toggle();
- 		}
  	});
  });
  $('#parties-page').live('pageshow', function(event) {
@@ -224,6 +219,7 @@
 
  function displayCheckins(data) {
  	var checkins = data.checkins;
+ 	if (checkins.length>0){
  	var blocks = ['a', 'b', 'c', 'd'];
  	$.each(
  	checkins, function(index, c) {
@@ -234,10 +230,14 @@
  		var cls = "ui-block-" + blocks[k];
  		$('#checkingrid').append('<div class=' + cls + '> <a href="userCheckin.html?id=' + event_id + '" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
  	});
+ 	} else {
+ 		$('#yourcheckins-content').append('<p class="italic">It looks pretty empty around here. Attend some party and watch your poster wall filling up ;)</p>');
+ 	}
  }
 
  function displayPatches(data) {
  	var patches = data.patches;
+ 	if (patches.length>0){
  	console.log(patches);
  	var blocks = ['a', 'b', 'c', 'd'];
  	$('#patchgrid').empty();
@@ -250,6 +250,9 @@
  		var cls = "ui-block-" + blocks[k];
  		$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '&claimed=' + p.claimed + '" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
  	});
+ } else {
+ 	$('#yourpatches-content').append('<p class="italic">It looks pretty empty around here. Attend some party and collect awsome patches ;)</p>');
+ }
  }
 
  function displayAllPatches(patches) {
@@ -301,18 +304,18 @@
 
  }
 
- function displayPatch(data) {
- 	$('#patchH1').html(data.name);
- 	var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
- 	$('#patchContent').html(output);
- 	console.log(data);
- 	if (!data.claimed) {
- 		$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
- 		$('#btn-claimed').button();
- 	}
+ // function displayPatch(data) {
+ // 	$('#patchH1').html(data.name);
+ // 	var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
+ // 	$('#patchContent').html(output);
+ // 	console.log(data);
+ // 	if (!data.claimed) {
+ // 		$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
+ // 		$('#btn-claimed').button();
+ // 	}
 
 
- }
+ // }
 
  function displayCheckin(data) {
  	$('#checkinH1').html(data.name);
@@ -527,7 +530,7 @@
  	var myLat = pos.coords.latitude;
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
- 	if (distance <= 1000000) { //TODO: distance = 100
+ 	if (distance <= 120) { //TODO: distance = 100
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
@@ -589,8 +592,8 @@
  		var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
  		$('#patchContent').html(output);
  		if (claimed == 'false') {
- 			$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
- 			$('#btn-claimed').button();
+ 			$('#patchContent').append('<p>Woah! Show this virtual patch to the staff to get a real one and then tap the button!</p><a data-role="button" data-icon="check" data-theme="b" data-rel="dialog" href="claimPatch.html?id="'+patch +' id="btn-dialog-claimed">OK, I got my real patch!</a>');
+ 			$('#btn-dialog-claimed').button();
  		}
  	});
  });
