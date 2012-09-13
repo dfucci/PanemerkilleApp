@@ -553,7 +553,7 @@
  	var id = getUrlVars()['id'];
  	$('#btnCheckin').attr('href', 'checkin.html?event=' + id);
  	
- 	ajax({ 			
+ 	$.ajax({ 			
 			url: endpoint + '/events/' + id,
 		 	type: "GET",
 		 	dataType: "json",
@@ -566,6 +566,8 @@
  });
 
  function displayParty(data) {
+	console.log("single party");
+	console.log(data.name);
  	$('#party-header h1').html(data.name);
  	$('#posterImg').attr('src', data.poster_url);
  	$('#party-venue').html(data.venue.name);
