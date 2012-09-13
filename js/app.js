@@ -31,7 +31,7 @@
 			url: endpoint + "/events",
 		 	type: "GET",
 		 	dataType: "json",
-		 	cache: false,
+		 	cache: true,
 	}).done(function(data){displayParties(data)});
 	 
  	//$.getJSON(endpoint + '/events', displayParties);
@@ -401,6 +401,8 @@
 
  function displayAllPatches(patches) {
 
+	console.log("displayAllPatches");
+	console.log(patches.length);
 
  	$('#patchgrid').empty();
  	var blocks = ['a', 'b', 'c', 'd'];
@@ -411,6 +413,7 @@
 	 	dataType: "json",
 	 	cache: false,
  	}).done(function(user) {
+
  		userPatches = new Array();
  		for (var int = 0; int < user.patches.length; int++) {
  			var patch = {
@@ -419,7 +422,7 @@
  			};
  			userPatches.push(patch);
  		}
- 		console.log(userPatches);
+ 		console.log(userPatches.length);
 
  		var patches_ids = $.map(userPatches, function(o) {
  			return o["id"];
@@ -712,12 +715,13 @@
  }
  
  $('#patches').live('pageshow', function(event) {
-	 	$.ajax({
+	 console.log('live patches');
+	 $.ajax({
 			url: endpoint + '/patches/',
 		 	type: "GET",
 		 	dataType: "json",
-		 	cache: false,
-	 	}).done(function(data){displayAllPatches(data)});
+		 	cache: true,
+	 }).done(function(data){displayAllPatches(data)});
  });
 
  // $('#patch').live('pageshow', function(event) {
