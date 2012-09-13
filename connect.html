@@ -12,37 +12,6 @@
   <script src="cdv-plugin-fb-connect.js"></script>
   <script src="facebook_js_sdk.js"></script>
   <script src="js/app.js"></script>
-  <script type="text/javascript">
-
-FB.Event.subscribe('auth.login', function(response) {
-  if (response.authResponse) {
-     FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
-       registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender,
-        response.picture, response.email);
-     });
-   } else {
-     console.log('User cancelled login or did not fully authorize.');
-   }
-});
-
-$("#connect").live('pageshow', function() { //JQM
-  FB.init({
-    appId: "366089376758944",
-    nativeInterface: CDV.FB,
-    useCachedDialogs: false,
-
-  });
-});
-
-$("#fbConnect").live('click', function(e) {
-  $("#connecting").html("<img src='images/loader.gif' alt='loading'>");
-  FB.login(
-  function(response) {}, {
-    scope: "email, user_birthday, publish_actions, publish_stream"
-  });
-});
-
-  </script>
 </head>
 <body>
 
