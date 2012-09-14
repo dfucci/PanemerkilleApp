@@ -396,7 +396,6 @@
  				else {
  					for (var i = 0; i < res.data.length; i++) {
  						if (typeof res.data[i].installed != "undefined") {
- 							console.log('trovato');
  							pmFriends.push(res.data[i]);
  						}
  					}
@@ -530,7 +529,7 @@
  	var myLat = pos.coords.latitude;
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
- 	if (distance <= 120) { //TODO: distance = 100
+ 	if (distance <= 100000) { //TODO: distance = 100
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
