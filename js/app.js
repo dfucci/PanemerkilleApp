@@ -392,7 +392,7 @@
  		$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '&claimed=' + p.claimed + '" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
  	});
  } else {
- 	$('#yourpatches-content').append('<p class="italic">It looks pretty empty around here. Attend some party and collect awsome patches ;)</p>');
+ 	$('#yourpatches-content').append('<p class="italic">It looks pretty empty around here. Attend some party and collect awesome patches ;)</p>');
  }
  }
 
