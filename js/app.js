@@ -3,6 +3,7 @@
  var user = {};
  var eventObj = {};
  var venueObj = {}; // TODO: refactor
+ 
  $('#FBLogout').live('tap', function() {
  	console.log('bye bye');
  	window.localStorage.clear();
@@ -13,7 +14,8 @@
 
  	});
  	FB.logout(function(response) {
- 		$(location).attr('href', 'connect.html');
+ 		$.mobile.changePage('connect.html');
+ 		//$(location).attr('href', 'connect.html');
  	});
  });
 
@@ -25,18 +27,36 @@
  	});
  });
  $('#parties-page').live('pageshow', function(event) {
- 	$.getJSON(endpoint + '/events', displayParties);
+ 
+	$.ajax({ 			
+			url: endpoint + "/events",
+		 	type: "GET",
+		 	dataType: "json",
+		 	cache: false,
+	}).done(function(data){displayParties(data)});
+	 
+ 	//$.getJSON(endpoint + '/events', displayParties);
  	populateUserFriends();
  });
 
  $('#yourpatches').live('pageshow', function(event) {
  	var id = getUrlVars()["user"];
- 	$.getJSON(endpoint + '/users/' + id, displayPatches);
+ 	$.ajax({ 			
+		url: endpoint + "/users/" + user.id,
+	 	type: "GET",
+	 	dataType: "json",
+	 	cache: false,
+ 	}).done(function(data){displayPatches(data)});
  });
 
  $('#yourcheckins').live('pageshow', function(event) {
  	var id = getUrlVars()["user"];
- 	$.getJSON(endpoint + '/users/' + id, displayCheckins);
+ 	$.ajax({ 			
+		url: endpoint + "/users/"  + id,
+	 	type: "GET",
+	 	dataType: "json",
+	 	cache: false,
+ 	}).done(function(data){displayCheckins(data)});
  });
 
  $('#btnCheckin').live('tap', function(event) {
@@ -71,10 +91,119 @@
  $('#checkedin-page').live('pageshow', displayCheckinStats);
 
  $('#stream').live('pageshow', displayStream);
+ 
+ 
+ 
+ document.addEventListener('deviceready', init, false);
 
+ 
+ 
+ function init() {
+   $.mobile.pushStateEnabled = false; 
+   console.log('init');
+   try {
+     FB.init({
+       appId: "366089376758944",
+       nativeInterface: CDV.FB,
+       useCachedDialogs: false,
+
+     });
+     console.log('1');
+     
+     var timeoutHandler = setTimeout(function() { requestFailed(); }, 1000);
+
+	    function requestFailed() {
+	        // When this happens, it means that FB API was unresponsive
+	        alert('hey, FB API does not work!');
+	    }
+
+	 FB.getLoginStatus(function(response) {
+	        clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
+	   		console.log('2');
+	        if (response.status === 'connected') {
+	          console.log('connesso');
+	         //var facebook_id = response.authResponse.userID;
+	         var facebook_id = window.localStorage.getItem('pm_facebook_id');
+	         console.log(facebook_id);
+	          if (!isUserInStorage()) {
+	            console.log('user not in storage');
+	            
+	            $.ajax({ 			
+	    			url: endpoint + "/users/",
+	    		 	type: "GET",
+	    		 	dataType: "json",
+	    		 	cache: false,
+	    		 	data: {facebook_id: facebook_id}
+	            }).done(function(data) {
+	              if (data) {
+	                user.id = data[0]._id;
+	                console.log(user.id);
+	                saveUserStorage(user.id);
+	                $.mobile.changePage('parties.html');
+	                // $(location).attr('href', 'parties.html');
+	              }
+	            });
+	          } else {
+	            user.id=window.localStorage.getItem("pm_user_id");    
+	            console.log('user in storage' + user.id);
+	            // $(location).attr('href', 'parties.html');
+	            $.mobile.changePage('parties.html');
+	          }
+	        } else {
+	          console.log('non connesso');
+	          $.mobile.changePage('connect.html');
+	        }  
+	    }, true);
+	 
+     
+   } catch (e) {
+     alert(e);
+   }
+ }
+ 
+
+
+ $("#connect").live('pageinit', function() { //JQM
+	 FB.Event.subscribe('auth.login', function(response) {
+		   if (response.authResponse) {
+		      FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
+		        registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender,
+		         response.picture, response.email);
+		         console.log("/me callback");
+		      });
+		      console.log("/me after");
+		    } else {
+		      console.log('User cancelled login or did not fully authorize.');
+		    }
+		 });
+   console.log("pageshow connect");
+   FB.init({
+     appId: "366089376758944",
+     nativeInterface: CDV.FB,
+     useCachedDialogs: false,
+
+   });
+ });
+
+ $("#fbConnect").live('tap', function(e) {
+   console.log("Click!")
+   $("#connecting").html("<img src='images/loader.gif' alt='loading'>");
+   FB.login(
+   function(response) {}, {
+     scope: "email, user_birthday, publish_actions, publish_stream"
+   });
+ });
+
+
+ 
  function displayStream(prevPage) {
- 	$.getJSON(
- 	endpoint + "/users/" + user.id + "/friends", function(friends) {
+	
+	$.ajax({ 			
+			url: endpoint + "/users/" + user.id + "/friends",
+		 	type: "GET",
+		 	dataType: "json",
+		 	cache: false,
+	}).done(function(friends) {
  		$("#streamContent").empty();
  		for (var i = 0; i < friends.length; i++) {
  			var output = '';
@@ -97,7 +226,15 @@
  	var eventID = getUrlVars()['event'];
  	$(".checkin-event").html(eventObj.name);
  	$(".checkin-venue").html(venueObj.name);
- 	$.getJSON(endpoint + '/users/' + user.id, updateCheckinsVenue);
+ 	
+ 	$.ajax({ 			
+		url: endpoint + "/users/" + user.id,
+	 	type: "GET",
+	 	dataType: "json",
+	 	cache: false,
+ 	}).done(function(data){updateCheckinsVenue(data)});
+ 	
+ 	//$.getJSON(endpoint + '/users/' + user.id, updateCheckinsVenue);
  }
 
  function updateCheckinsVenue(data) {
@@ -125,8 +262,12 @@
 
  		for (var i = 0; i < unseen.length; i++) {
  			var id = unseen[i].patch._id;
-
- 			$.getJSON(endpoint + '/patches/' + id, function(patch) {
+ 		 	$.ajax({ 			
+ 				url: endpoint + "/patches/" + id,
+ 			 	type: "GET",
+ 			 	dataType: "json",
+ 			 	cache: false,
+ 		 	}).done(function(patch) {
 
  				var output = "";
  				output += '<li class="list-patch">';
@@ -257,12 +398,19 @@
 
  function displayAllPatches(patches) {
 
+	console.log("displayAllPatches");
+	console.log(patches.length);
 
  	$('#patchgrid').empty();
  	var blocks = ['a', 'b', 'c', 'd'];
 
+ 	$.ajax({ 			
+		url: endpoint + "/users/" + user.id,
+	 	type: "GET",
+	 	dataType: "json",
+	 	cache: false,
+ 	}).done(function(user) {
 
- 	$.getJSON(endpoint + "/users/" + user.id, function(user) {
  		userPatches = new Array();
  		for (var int = 0; int < user.patches.length; int++) {
  			var patch = {
@@ -271,7 +419,7 @@
  			};
  			userPatches.push(patch);
  		}
- 		console.log(userPatches);
+ 		console.log(userPatches.length);
 
  		var patches_ids = $.map(userPatches, function(o) {
  			return o["id"];
@@ -299,9 +447,6 @@
 
  	});
 
-
- 	$
-
  }
 
  // function displayPatch(data) {
@@ -326,25 +471,7 @@
  $('#profile').live('pagebeforeshow', function() {
  	populateUser(user.id);
  });
- // evento originale: 'pagebeforecreate'
- // $('#profile').live('pagebeforeshow', function() {
- // //TODO: carica l'id quando phonegap è pronto
- // if (user.id == undefined) { //TODO: controlla lo storage per l'id
- // facebook_id = window.localStorage.getItem("pm_facebook_id");
- // if (facebook_id == undefined) { //TODO: elimina
- // facebook_id = 641892040;
- // }
- // console.log(facebook_id);
- // }
- // $.getJSON(endpoint + "/users", {
- // facebook_id: facebook_id
- // }, function(data) {
- // if (data) {
- // //user.id = data[0]._id;
- // populateUser(user.id);
- // }
- // });
- // });
+ 
 
  function isUserInStorage() {
  	// var facebook_id = window.localStorage.getItem("pm_facebook_id");
@@ -362,7 +489,13 @@
  function populateUser(userid) {
  	$("#userPatchesLink").attr('href', 'userPatches.html?user=' + userid);
  	$("#userCheckinLink").attr('href', 'userCheckins.html?user=' + userid);
- 	$.getJSON(endpoint + "/users/" + userid, function(data) {
+ 	 
+ 	$.ajax({ 			
+ 			url: endpoint + "/users/" + userid,
+ 		 	type: "GET",
+ 		 	dataType: "json",
+ 		 	cache: false,
+ 	}).done(function(data) {
  		$("#picture_url").attr("src", data.picture_url);
  		$("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
  		$("#firstname").html(data.name.firstname);
@@ -415,10 +548,22 @@
  $('#party').live('pageshow', function(event) {
  	var id = getUrlVars()['id'];
  	$('#btnCheckin').attr('href', 'checkin.html?event=' + id);
- 	$.getJSON(endpoint + '/events/' + id, displayParty);
+ 	
+ 	$.ajax({ 			
+			url: endpoint + '/events/' + id,
+		 	type: "GET",
+		 	dataType: "json",
+		 	cache: false,
+	}).done(function(data) {
+		displayParty(data);
+	}); 
+ 	
+ 	//$.getJSON(endpoint + '/events/' + id, displayParty);
  });
 
  function displayParty(data) {
+	console.log("single party");
+	console.log(data.name);
  	$('#party-header h1').html(data.name);
  	$('#posterImg').attr('src', data.poster_url);
  	$('#party-venue').html(data.venue.name);
@@ -491,7 +636,12 @@
 
  function enableCheckinBtn() {
  	var eventID = getUrlVars()['id'];
- 	$.getJSON(endpoint + '/users/' + user.id, function(data) {
+ 	$.ajax({ 			
+		url: endpoint + "/users/" + user.id,
+	 	type: "GET",
+	 	dataType: "json",
+	 	cache: false,
+ 	}).done(function(data){
  		for (var i = 0; i < data.checkins.length; i++) {
  			console.log(data.checkins[i].event._id);
  			if (data.checkins[i].event._id == eventID) { //check if the user checked in at the same event
@@ -529,7 +679,7 @@
  	var myLat = pos.coords.latitude;
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
- 	if (distance <= 100000) { //TODO: distance = 100
+ 	if (distance <= 200) { 
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
@@ -561,8 +711,15 @@
  function toRad(deg) {
  	return deg * Math.PI / 180;
  }
+ 
  $('#patches').live('pageshow', function(event) {
- 	$.getJSON(endpoint + '/patches/', displayAllPatches);
+	 console.log('live patches');
+	 $.ajax({
+			url: endpoint + '/patches/',
+		 	type: "GET",
+		 	dataType: "json",
+		 	cache: true,
+	 }).done(function(data){displayAllPatches(data)});
  });
 
  // $('#patch').live('pageshow', function(event) {
@@ -586,7 +743,12 @@
  	}
  	var patch = vars['id'];
  	var claimed = vars['claimed'];
- 	$.getJSON(endpoint + '/patches/' + patch, function(data) {
+ 	$.ajax({ 			
+		url: endpoint + '/patches/'+ patch,
+	 	type: "GET",
+	 	dataType: "json",
+	 	cache: false,
+ 	}).done(function(data) {
  		$('#patchH1').html(data.name);
  		var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
  		$('#patchContent').html(output);
@@ -599,7 +761,14 @@
 
  $('#checkin').live('pageshow', function(event) {
  	var id = getUrlVars()["id"];
- 	$.getJSON(endpoint + '/events/' + id, displayCheckin);
+ 	
+ 	$.ajax({ 			
+		url: endpoint + "/events/" + id,
+	 	type: "GET",
+	 	dataType: "json",
+	 	cache: false,
+ 	}).done(function(data){displayCheckin(data)});
+ 
  });
 
  function getUrlVars() {
@@ -635,6 +804,7 @@
 
  		}
  		window.localStorage.setItem("pm_facebook_id", facebook_id);
+ 		console.log("bumbum");
  		$(location).attr('href', 'index.html');
 
  	});
