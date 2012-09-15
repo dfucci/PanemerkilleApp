@@ -3,6 +3,7 @@
  var user = {};
  var eventObj = {};
  var venueObj = {}; // TODO: refactor
+ 
  $('#FBLogout').live('tap', function() {
  	console.log('bye bye');
  	window.localStorage.clear();
@@ -31,7 +32,7 @@
 			url: endpoint + "/events",
 		 	type: "GET",
 		 	dataType: "json",
-		 	cache: true,
+		 	cache: false,
 	}).done(function(data){displayParties(data)});
 	 
  	//$.getJSON(endpoint + '/events', displayParties);
@@ -93,16 +94,12 @@
  
  
  
- $( '#index' ).live( 'pageinit',function(event){
-	    console.log("pageinit")
- });
-
- 
  document.addEventListener('deviceready', init, false);
 
  
  
  function init() {
+   $.mobile.pushStateEnabled = false; 
    console.log('init');
    try {
      FB.init({
@@ -683,7 +680,7 @@
  	var myLat = pos.coords.latitude;
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
- 	if (distance <= 120) { //TODO: distance = 100
+ 	if (distance <= 200) { //TODO: distance = 100
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
