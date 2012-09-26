@@ -1,6 +1,5 @@
- var DEBUG="http://panemerkille-stagin.herokuapp.com";
  //var endpoint = "http://panemerkille.herokuapp.com";
- var endpoint = DEBUG;
+
  var user = {};
  var eventObj = {};
  var venueObj = {}; // TODO: refactor
@@ -32,7 +31,7 @@
  
  var noGps = function() {
 	 	console.log("No GPS");
-		$.mobile.changePage('gpsError.html');
+		$.mobile.changePage('gpsError.html', {transition: 'pop', role: 'dialog'});
  }
  
  var okGps = function () {
@@ -692,7 +691,7 @@
  	var myLat = pos.coords.latitude;
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
- 	if (distance <= 200) { 
+ 	if (distance <= maxDistance) { 
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
@@ -703,8 +702,7 @@
  }
  
  
- 
- 
+  
 
  function haversine(lon1, lat1, lon2, lat2) {
  	var R = 6371; // km
