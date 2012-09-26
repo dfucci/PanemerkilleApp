@@ -4,6 +4,7 @@
  var user = {};
  var eventObj = {};
  var venueObj = {}; // TODO: refactor
+ var platform;
  
  $('#FBLogout').live('tap', function() {
  	console.log('bye bye');
@@ -28,17 +29,30 @@
  		claimed: 'true'
  	});
  });
- $('#parties-page').live('pageshow', function(event) {
  
-	$.ajax({ 			
+ var noGps = function() {
+	 	console.log("No GPS");
+		$.mobile.changePage('gpsError.html');
+ }
+ 
+ var okGps = function () {
+	 console.log("Ok GPS");
+	 $.ajax({ 			
 			url: endpoint + "/events",
 		 	type: "GET",
 		 	dataType: "json",
 		 	cache: false,
 	}).done(function(data){displayParties(data)});
 	 
- 	//$.getJSON(endpoint + '/events', displayParties);
- 	populateUserFriends();
+	populateUserFriends();
+ }
+ 
+ $('#parties-page').live('pageshow', function(event) {
+    
+	 navigator.geolocation.getCurrentPosition(okGps, noGps, {
+			enableHighAccuracy: true
+	 }); 
+	 
  });
 
  $('#yourpatches').live('pageshow', function(event) {
@@ -67,7 +81,6 @@
 	    if(clicked){
 	    	return;
 	    }
-	    //$('#btnCheckin').die('tap');
 	    clicked = true;
 	 	var eventid = getUrlVars()['id'];
 	 	console.log('button checkin tapped');
@@ -103,13 +116,14 @@
 
  $('#stream').live('pageshow', displayStream);
  
+
  
  
  document.addEventListener('deviceready', init, false);
 
  
- 
  function init() {
+   platform = device.platform; 
    $.mobile.pushStateEnabled = false; 
    console.log('init');
    try {
@@ -297,6 +311,8 @@
  }
 
  function displayParties(data) { // TODO: refactor
+	
+	 
  	var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
  	boilerplate += "<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
  	$('#parties-listview').html(boilerplate);
@@ -339,6 +355,8 @@
  	$("#parties-listview").listview('refresh');
  }
 
+
+ 
  function trailingZero(time) {
  	if (time < 10) {
  		time = "0" + time.toString();
@@ -459,19 +477,6 @@
 
  }
 
- // function displayPatch(data) {
- // 	$('#patchH1').html(data.name);
- // 	var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
- // 	$('#patchContent').html(output);
- // 	console.log(data);
- // 	if (!data.claimed) {
- // 		$('#patchContent').append('<a data-role="button" data-icon="check" data-theme="b" id="btn-claimed">Ok, I have got it!</a>');
- // 		$('#btn-claimed').button();
- // 	}
-
-
- // }
-
  function displayCheckin(data) {
  	$('#checkinH1').html(data.name);
  	var poster_big = buildBigImg(data.poster_url);
@@ -557,7 +562,6 @@
 
  $('#party').live('pageshow', function(event) {
  	var id = getUrlVars()['id'];
- 	//$('#btnCheckin').attr('href', 'checkin.html?event=' + id);
  	
  	$.ajax({ 			
 			url: endpoint + '/events/' + id,
@@ -568,7 +572,6 @@
 		displayParty(data);
 	}); 
  	
- 	//$.getJSON(endpoint + '/events/' + id, displayParty);
  });
 
  function displayParty(data) {
@@ -698,6 +701,10 @@
  	}
 
  }
+ 
+ 
+ 
+ 
 
  function haversine(lon1, lat1, lon2, lat2) {
  	var R = 6371; // km
@@ -780,7 +787,20 @@
  	}).done(function(data){displayCheckin(data)});
  
  });
+ 
+ $('#btnRetryGps').live('tap', function(event) {
+	 navigator.geolocation.getCurrentPosition(onGPSRetrySuccess, onGPSRetryError, {
+			enableHighAccuracy: true
+		});
+ });
 
+ var onGPSRetrySuccess = function() {
+	 	//$.mobile.changePage('parties.html');
+ }
+ var onGPSRetryError = function() {
+	 	//$.mobile.changePage('gpsError.html');
+}
+ 
  function getUrlVars() {
  	var vars = [],
  		hash;
