@@ -16,7 +16,6 @@
  	});
  	FB.logout(function(response) {
  		$.mobile.changePage('connect.html');
- 		//$(location).attr('href', 'connect.html');
  	});
  });
 
@@ -29,9 +28,11 @@
  	});
  });
  
- var noGps = function() {
-	 	console.log("No GPS");
-		$.mobile.changePage('gpsError.html', {transition: 'pop', role: 'dialog'});
+ var noGps = function(error) {
+	 console.log("No GPS");
+	 console.log(error.code);
+	 $.mobile.changePage('gpsError.html', {transition: 'pop', role: 'dialog'});
+	 
  }
  
  var okGps = function () {
@@ -47,7 +48,6 @@
  }
  
  $('#parties-page').live('pageshow', function(event) {
-    
 	 navigator.geolocation.getCurrentPosition(okGps, noGps, {
 			enableHighAccuracy: true
 	 }); 
@@ -74,42 +74,7 @@
  	}).done(function(data){displayCheckins(data)});
  });
 
- var clicked = false;
- $('#btnCheckin').live('tap', function(event) {
-	    console.log("Click!")
-	    if(clicked){
-	    	return;
-	    }
-	    clicked = true;
-	 	var eventid = getUrlVars()['id'];
-	 	console.log('button checkin tapped');
-	 	if ($('input[name=checkbox-0]').is(':checked')) {
-	 		console.log('fb status');
-	 		var party = $('#party-header h1').text();
-	 		var image = $('#posterImg').attr('src');
-	 		var place = $('#party-venue').text();
-	 		var description = $('#party-desc').text();
-	 		FB.api('/me/feed', 'post', {
-	 			message: 'I am partying at ' + party + " at " + place,
-	 			picture: image,
-	 			link: 'http://www.panemerkille.fi',
-	 			name: party,
-	 			caption: "at " + place,
-	 			description: description
-	 		}, function(response) {
-	 			if (!response || response.error) console.log('Error while posting on Facebook');
-	 			else console.log('Post successfull');
-	 		});
-	 	}
-	
-	 	$.post(endpoint + '/users/' + user.id + '/checkins', {
-	 		event: eventid
-	 	}, function(data) {
-	 		$.mobile.changePage('checkin.html?event=' + eventid);
-	 		clicked = false;
-	 	});
-	    
- });
+ 
 
  $('#checkedin-page').live('pageshow', displayCheckinStats);
 
@@ -311,7 +276,8 @@
 
  function displayParties(data) { // TODO: refactor
 	
-	 
+	console.log("displayParties"); 
+	
  	var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
  	boilerplate += "<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
  	$('#parties-listview').html(boilerplate);
@@ -574,6 +540,7 @@
  });
 
  function displayParty(data) {
+	
 	console.log("single party");
 	console.log(data.name);
  	$('#party-header h1').html(data.name);
@@ -624,6 +591,47 @@
  	eventObj.name = data.name;
  	enableCheckinBtn();
  	displayPartyAttenders(data.attenders);
+ 	
+ 	
+ 	//var clicked = false;
+	$('#btnCheckin').one('tap', function(event) {
+		    console.log("Click!")
+		   /* if(clicked){
+		    	return;
+		    }*/
+		    clicked = true;
+		 	var eventid = getUrlVars()['id'];
+		 	console.log('button checkin tapped');
+		 	if ($('input[name=checkbox-0]').is(':checked')) {
+		 		console.log('fb status');
+		 		var party = $('#party-header h1').text();
+		 		var image = $('#posterImg').attr('src');
+		 		var place = $('#party-venue').text();
+		 		var description = $('#party-desc').text();
+		 		FB.api('/me/feed', 'post', {
+		 			message: 'I am partying at ' + party + " at " + place,
+		 			picture: image,
+		 			link: 'http://www.panemerkille.fi',
+		 			name: party,
+		 			caption: "at " + place,
+		 			description: description
+		 		}, function(response) {
+		 			if (!response || response.error) console.log('Error while posting on Facebook');
+		 			else console.log('Post successfull');
+		 		});
+		 	}
+		
+		 	$.post(endpoint + '/users/' + user.id + '/checkins', {
+		 		event: eventid
+		 	}, function(data) {
+		 		$.mobile.changePage('checkin.html?event=' + eventid);
+		 		//clicked = false;
+		 	});
+		    
+	});
+ 	
+ 	
+ 	
  }
 
 
