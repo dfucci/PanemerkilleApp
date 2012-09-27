@@ -28,15 +28,9 @@
  	});
  });
  
- var noGps = function(error) {
-	 console.log("No GPS");
-	 console.log(error.code);
-	 $.mobile.changePage('gpsError.html', {transition: 'pop', role: 'dialog'});
-	 
- }
+
  
- var okGps = function () {
-	 console.log("Ok GPS");
+ $('#parties-page').live('pageshow', function(event) {
 	 $.ajax({ 			
 			url: endpoint + "/events",
 		 	type: "GET",
@@ -45,12 +39,6 @@
 	}).done(function(data){displayParties(data)});
 	 
 	populateUserFriends();
- }
- 
- $('#parties-page').live('pageshow', function(event) {
-	 navigator.geolocation.getCurrentPosition(okGps, noGps, {
-			enableHighAccuracy: true
-	 }); 
 	 
  });
 
@@ -690,8 +678,10 @@
  			return;
  		}
  		navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError, {
- 			enableHighAccuracy: true
- 		});
+			enableHighAccuracy: true,
+			maxiumAge: 60000,
+			timeout: 15000
+	 });
  	});
  }
 
@@ -727,8 +717,9 @@
 
  function onGPSError(err) {
  	console.log(err);
- 	$('#party-error').html('There is a problem finding your current location');
- 	$('#party-error').show();
+ 	$.mobile.changePage('gpsError.html', {transition: 'pop', role: 'dialog'});
+ 	//$('#party-error').html('There is a problem finding your current location');
+ 	//$('#party-error').show();
  }
 
  function toRad(deg) {
@@ -794,11 +785,6 @@
  
  });
  
- $('#btnRetryGps').live('tap', function(event) {
-	 navigator.geolocation.getCurrentPosition(onGPSRetrySuccess, onGPSRetryError, {
-			enableHighAccuracy: true
-		});
- });
 
  var onGPSRetrySuccess = function() {
 	 	//$.mobile.changePage('parties.html');
