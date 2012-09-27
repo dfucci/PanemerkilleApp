@@ -1,5 +1,6 @@
 */.DS_Store
 .DS_Store
-/cordova.js
-/cdv-plugin-fb-connect.js
-/facebook_js_sdk.js
+cordova.js
+cdv-plugin-fb-connect.js
+facebook_js_sdk.js
+js/config.js
