@@ -110,6 +110,7 @@
 	    		 	type: "GET",
 	    		 	dataType: "json",
 	    		 	cache: false,
+	    		 	timeout:10000,
 	    		 	data: {facebook_id: facebook_id}
 	            }).done(function(data) {
 	              if (data) {
@@ -119,7 +120,11 @@
 	                $.mobile.changePage('parties.html');
 	                // $(location).attr('href', 'parties.html');
 	              }
-	            });
+	            }).fail(function(jXHR, textStatus){
+					if(textStatus==="timeout"){
+						$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+					}
+				});
 	          } else {
 	            user.id=window.localStorage.getItem("pm_user_id");    
 	            console.log('user in storage' + user.id);
@@ -179,6 +184,7 @@
 		 	type: "GET",
 		 	dataType: "json",
 		 	cache: false,
+		 	timeout:10000
 	}).done(function(friends) {
  		$("#streamContent").empty();
  		for (var i = 0; i < friends.length; i++) {
@@ -195,7 +201,12 @@
  			$('#listview-stream' + i).listview();
  		}
 
- 	});
+ 	}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  }
 
  function displayCheckinStats(event) {
@@ -208,7 +219,13 @@
 	 	type: "GET",
 	 	dataType: "json",
 	 	cache: false,
- 	}).done(function(data){updateCheckinsVenue(data)});
+	 	timeout:10000
+ 	}).done(function(data){updateCheckinsVenue(data)}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  	
  	//$.getJSON(endpoint + '/users/' + user.id, updateCheckinsVenue);
  }
@@ -243,6 +260,7 @@
  			 	type: "GET",
  			 	dataType: "json",
  			 	cache: false,
+ 			 	timeout:10000
  		 	}).done(function(patch) {
 
  				var output = "";
@@ -257,7 +275,12 @@
  				if (unseen.length == count) {
  					$('#liview-checkin').listview('refresh');
  				}
- 			});
+ 			}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  		};
  	}
  }
@@ -390,6 +413,7 @@
 	 	type: "GET",
 	 	dataType: "json",
 	 	cache: false,
+	 	timeout:10000
  	}).done(function(user) {
 
  		userPatches = new Array();
@@ -426,7 +450,12 @@
 
 
 
- 	});
+ 	}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
 
  }
 
@@ -463,6 +492,7 @@
  		 	type: "GET",
  		 	dataType: "json",
  		 	cache: false,
+ 		 	timeout:10000
  	}).done(function(data) {
  		$("#picture_url").attr("src", data.picture_url);
  		$("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
@@ -476,7 +506,12 @@
  			width: 100,
  			vertical: 'top'
  		});
- 	});
+ 	}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  }
 
 
@@ -521,8 +556,14 @@
 		 	type: "GET",
 		 	dataType: "json",
 		 	cache: false,
+		 	timeout:10000
 	}).done(function(data) {
 		displayParty(data);
+	}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
 	}); 
  	
  });
@@ -649,9 +690,12 @@
 	 	type: "GET",
 	 	dataType: "json",
 	 	cache: false,
+	 	timeout:10000
  	}).done(function(data){
+ 		console.log('done');
  		for (var i = 0; i < data.checkins.length; i++) {
  			console.log(data.checkins[i].event._id);
+ 			console.log('done for');
  			if (data.checkins[i].event._id == eventID) { //check if the user checked in at the same event
  				$('#party-error').html('You have already checked in here.');
  				$('#party-error').show();
@@ -659,6 +703,7 @@
  			}
  		}
  		if (data.checkins.length > 0) {
+ 			console.log('done > 0');
  			var lastCheckin = moment(data.checkins[data.checkins.length - 1].timestamp);
  			var now = moment();
  			var diff = now.diff(lastCheckin, 'minutes');
@@ -670,7 +715,7 @@
  				return;
  			}
  		}
-
+ 		console.log('done 2 if');
  		var day = $('#day').text();
  		if (day != 'Now') { //event has not started yet
  			$('#party-error').html('This is not happening now.');
@@ -682,7 +727,12 @@
 			maxiumAge: 60000,
 			timeout: 15000
 	 });
- 	});
+ 	}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  }
 
  function onGPSSuccess(pos) {
@@ -733,7 +783,13 @@
 		 	type: "GET",
 		 	dataType: "json",
 		 	cache: true,
-	 }).done(function(data){displayAllPatches(data)});
+		 	timeout:10000
+	 }).done(function(data){displayAllPatches(data)}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  });
 
  // $('#patch').live('pageshow', function(event) {
@@ -762,6 +818,7 @@
 	 	type: "GET",
 	 	dataType: "json",
 	 	cache: false,
+	 	timeout:10000
  	}).done(function(data) {
  		$('#patchH1').html(data.name);
  		var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
@@ -770,7 +827,12 @@
  			$('#patchContent').append('<p>Woah! Show this virtual patch to the staff to get a real one and then tap the button!</p><a data-role="button" data-icon="check" data-theme="b" data-rel="dialog" href="claimPatch.html?id="'+patch +' id="btn-dialog-claimed">OK, I got my real patch!</a>');
  			$('#btn-dialog-claimed').button();
  		}
- 	});
+ 	}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  });
 
  $('#checkin').live('pageshow', function(event) {
@@ -780,8 +842,14 @@
 		url: endpoint + "/events/" + id,
 	 	type: "GET",
 	 	dataType: "json",
-	 	cache: false,
- 	}).done(function(data){displayCheckin(data)});
+	 	timeout:10000,
+	 	cache: false
+ 	}).done(function(data){displayCheckin(data)}).fail(function(jXHR, textStatus){
+		if(textStatus==="timeout"){
+			console.log("Timeout exceeded!");
+			$.mobile.changePage('timeoutError.html', {transition: 'pop', role: 'dialog'});
+		}
+	});
  
  });
  
