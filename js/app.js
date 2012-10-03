@@ -403,7 +403,11 @@
  		if (party.venue.featured) {
  			featured += "<img class='featured' src='images/corner.png'/>";
  		}
- 		if ((isToday(sTime)) || (isGoingOn(sTime, sEnd))) {
+ 		if (isGoingOn(sTime, sEnd)) {
+ 			noPartyToday = false;
+ 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
+ 			$('#li-today').after(out);
+ 		} else if (isToday(sTime)) 	{
  			noPartyToday = false;
  			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-today').after(out);
@@ -1048,13 +1052,6 @@
 
  });
 
-
- var onGPSRetrySuccess = function() {
- 	//$.mobile.changePage('parties.html');
- 	}
- var onGPSRetryError = function() {
- 	//$.mobile.changePage('gpsError.html');
- 	}
 
  function getUrlVars() {
  	var vars = [],
