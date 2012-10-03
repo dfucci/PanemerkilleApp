@@ -139,7 +139,6 @@
  			useCachedDialogs: false,
 
  		});
- 		//TODO: alert .fail() timeout!!!   
  		var timeoutHandler = setTimeout(function() {
  			requestFailed();
  		}, 1000);
@@ -153,7 +152,6 @@
  			clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
  			if (response.status === 'connected') {
  				console.log('connesso');
- 				//var facebook_id = response.authResponse.userID;
  				var facebook_id = window.localStorage.getItem('pm_facebook_id');
  				console.log(facebook_id);
  				if (!isUserInStorage()) {
@@ -169,13 +167,17 @@
  							facebook_id: facebook_id
  						}
  					}).done(function(data) {
- 						if (data) {
+ 						if (data.length>0) {
  							user.id = data[0]._id;
- 							console.log(user.id);
  							saveUserStorage(user.id);
  							$.mobile.changePage('parties.html');
- 							// $(location).attr('href', 'parties.html');
+ 						} else {
+ 							FB.logout(function(response) {
+ 						 		$.mobile.changePage('connect.html');
+ 						 	});
+ 							
  						}
+ 						
  					}).fail(function(jXHR, textStatus) {
  						if (textStatus === "timeout") {
  							$.mobile.changePage('timeoutError.html', {
@@ -206,7 +208,7 @@
 
  $("#connect").live('pageinit', function() {
  	$.mobile.loading('show', {
- 		text: 'Loading the parties list...',
+ 		text: 'Loading...',
  		textVisible: true,
  		theme: 'a',
 
