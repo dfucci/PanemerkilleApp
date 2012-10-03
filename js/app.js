@@ -385,10 +385,13 @@
 
  function displayParties(data) { // TODO: refactor
  	var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
+ 	boilerplate += "<li data-role='list-divider' id='li-tomorrow'>Tomorrow</li>";
  	boilerplate += "<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
  	$('#parties-listview').html(boilerplate);
  	var noPartyToday = true;
+ 	var noPartyTomorrow = true;
  	var noPartyUpcoming = true;
+ 	
  	$.each(data.reverse(), function(index, party) {
  		var out = '';
  		var sTime = moment(party.time.start).toDate();
@@ -404,7 +407,12 @@
  			noPartyToday = false;
  			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-today').after(out);
- 		} else {
+ 		} else if (isTomorrow(sTime)) {	
+ 			noPartyTomorrow = false;
+ 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			$('#li-tomorrow').after(out);
+ 			
+ 		} else  {
  			noPartyUpcoming = false;
  			var today = new Date();
  			var tomorrow = new Date();
@@ -418,6 +426,9 @@
  	});
  	if (noPartyToday) {
  		$('#li-today').after("<li><p  class='italic no-event'>Unfortunately there's nothing going on tonight. </p><p class='italic no-event'>Take some time to sew your patches ;)</p></li>");
+ 	}
+ 	if (noPartyTomorrow) {
+ 		$('#li-today').after("<li><p  class='italic no-event'>Unfortunately there's nothing planned for tomorrow. </p><p class='italic no-event'> Yet.</p></li>");
  	}
  	if (noPartyUpcoming) {
  		$('#li-upcoming').after("<li><p  class='italic no-event'>Unfortunately there are no upcoming events. </p><p class='italic no-event'>It might be the right time to take have rest :)</p></li>");
