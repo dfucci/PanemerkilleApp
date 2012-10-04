@@ -183,6 +183,13 @@
  					}).done(function(data) {
  						if (data.length>0) {
  							user.id = data[0]._id;
+ 							mixpanel.people.identify(user.id);
+ 							mixpanel.people.set({
+ 							    "$email": data[0].email,    
+ 							    "$created": data[0].registered,
+ 							    "$last_login": new Date(),        
+ 							    "gender": data[0].gender                   
+ 							});
  							saveUserStorage(user.id);
  							
  							$.mobile.changePage('parties.html');
@@ -200,11 +207,12 @@
  								role: 'dialog'
  							});
  						}
+ 						
  					});
  				} else {
  					user.id = window.localStorage.getItem("pm_user_id");
+ 					mixpanel.people.identify(user.id);
  					console.log('user in storage' + user.id);
- 	
  					$.mobile.changePage('parties.html');
  				}
  			} else {
