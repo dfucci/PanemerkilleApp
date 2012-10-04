@@ -633,11 +633,11 @@
  	}).done(function(data) {
  		$("#picture_url").attr("src", data.picture_url);
  		var picture_url;
- 		if ( data.picture_url == undefined ||  data.picture_url  == null ) {
- 			picture_url = "../images/facebookquestionmark.jpg"; 
- 		} else
+ 		if ( data.picture_url == undefined ||  data.picture_url  == null ) 
+ 			picture_url = "images/facebookquestionmark.jpg"; 
+ 		else
  			picture_url = data.picture_url;
- 		$("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
+ 		$("#profilePicture").html("<img id='profilePictureImg' src='" + picture_url + "'/>");
  		$("#firstname").html(data.name.firstname);
  		$("#surname").html(data.name.surname);
  		$("#patch_counter").html(data.patches.length);
