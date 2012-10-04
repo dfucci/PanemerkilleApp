@@ -27,10 +27,20 @@
  $('#btn-claimed').live('tap', function() {
 
  	var patch = getUrlVars()["id"];
- 	//TODO: POST user.checkins.claimed = true
- 	$.post(endpoint + '/users/' + user.id + "/patches/" + patch, {
- 		claimed: 'true'
- 	});
+ 	$.ajax({
+		  type: "POST",
+		  url: endpoint + '/users/' + user.id + "/patches/" + patch,
+		  data: {claimed: 'true'},
+	 	  cache: false,
+	 	  timeout: 10000
+	
+		}).done(function( data ) {
+	 		console.log("Patch claimed");
+		}).fail(function(jXHR, textStatus) {
+			console.log("Error claiming a patch");
+	 	});
+ 	
+
  });
 
 
@@ -170,6 +180,7 @@
  						if (data.length>0) {
  							user.id = data[0]._id;
  							saveUserStorage(user.id);
+ 							
  							$.mobile.changePage('parties.html');
  						} else {
  							FB.logout(function(response) {
@@ -189,7 +200,7 @@
  				} else {
  					user.id = window.localStorage.getItem("pm_user_id");
  					console.log('user in storage' + user.id);
- 					// $(location).attr('href', 'parties.html');
+ 	
  					$.mobile.changePage('parties.html');
  				}
  			} else {
@@ -216,7 +227,7 @@
  	FB.Event.subscribe('auth.login', function(response) {
  		if (response.authResponse) {
  			FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
- 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, response.picture, response.email);
+ 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, response.picture, response.email);			
  			});
  		} else {
  			console.log('User cancelled login or did not fully authorize.');
@@ -239,9 +250,7 @@
  		theme: 'a',
 
  	});
- 	FB.login(
-
- 	function(response) {}, {
+ 	FB.login(function(response) {}, {
  		scope: "email, user_birthday, publish_actions, publish_stream"
  	});
  });
@@ -593,7 +602,6 @@
  function isUserInStorage() {
  	// var facebook_id = window.localStorage.getItem("pm_facebook_id");
  	var user_id = window.localStorage.getItem("pm_user_id");
- 	console.log('checkin user' + user_id);
  	return user_id != null;
 
  }
@@ -642,31 +650,44 @@
 
 
  function populateUserFriends() {
- 	console.log('populateUserFriends');
  	FB.init({
  		appId: "366089376758944",
  		nativeInterface: CDV.FB,
  		useCachedDialogs: false,
  	});
+	console.log('populateUserFriends');
  	FB.getLoginStatus(function(response) {
  		if (response.status == 'connected') {
+ 			console.log("Retrieving user friends");
  			var pmFriends = new Array();
  			FB.api('/me/friends', {
  				fields: 'installed'
  			}, function(res) {
- 				if (res.error) console.log(res.error);
+ 	 			console.log("Answer received");
+ 				if (res.error) console.log(res.error.message);
  				else {
+ 		 			console.log("I have got the user friends");
  					for (var i = 0; i < res.data.length; i++) {
  						if (typeof res.data[i].installed != "undefined") {
  							pmFriends.push(res.data[i]);
  						}
  					}
  					var friendsParameter = JSON.stringify(pmFriends);
- 					$.post(endpoint + "/users/" + user.id + "/friends", {
- 						friends: friendsParameter
- 					}, function(data) {
- 						console.log(data);
- 					});
+ 					$.ajax({
+ 						  type: "POST",
+ 						  url: endpoint + "/users/" + user.id + "/friends",
+ 						  data: {friends: friendsParameter},
+ 					 	  cache: false,
+ 					 	  timeout: 10000
+ 					
+ 						}).done(function( data ) {
+ 							console.log(data);
+ 						}).fail(function(){
+ 							console.log("Error posting user friends");
+ 						});
+ 					
+ 					
+
  				}
  			});
 
@@ -785,19 +806,28 @@
  				else console.log('Post successfull');
  			});
  		}
+ 		$.ajax({
+			  type: "POST",
+			  url: endpoint + '/users/' + user.id + '/checkins',
+			  data: {event: eventid},
+		 	  cache: false,
+		 	  timeout: 10000
+		
+			}).done(function( data ) {
+				$.mobile.changePage('checkin.html?event=' + eventid);
+			}).fail(function(jXHR, textStatus) {
+		 		if (textStatus === "timeout") {
+		 			console.log("Timeout exceeded!");
+		 			$.mobile.changePage('timeoutError.html', {
+		 				transition: 'pop',
+		 				role: 'dialog'
+		 			});
+		 		}
+		 	});
 
- 		$.post(endpoint + '/users/' + user.id + '/checkins', {
- 			event: eventid
- 		}, function(data) {
- 			$.mobile.changePage('checkin.html?event=' + eventid);
- 			//clicked = false;
- 		});
 
  	});
-
-
-
- }
+}
 
 
  function displayPartyAttenders(attenders) {
@@ -1072,21 +1102,39 @@
 
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
  	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
- 		if (data.length < 1) {
- 			$.post(endpoint + '/users', {
- 				facebook_id: facebook_id,
- 				firstname: firstname,
- 				surname: surname,
- 				birthdate: birthdate,
- 				gender: gender,
- 				picture_url: picture_url,
- 				email: email
- 			});
-
+ 		if (data.length == 0) {
+ 	 		$.ajax({
+ 				  type: "POST",
+ 				  url: endpoint + '/users',
+ 				  data: {
+ 		 				facebook_id: facebook_id,
+ 		 				firstname: firstname,
+ 		 				surname: surname,
+ 		 				birthdate: birthdate,
+ 		 				gender: gender,
+ 		 				picture_url: picture_url,
+ 		 				email: email
+ 		 		  },
+ 			 	  cache: false,
+ 			 	  timeout: 10000
+ 			
+ 				}).done(function( data ) {
+ 					
+ 				 	window.localStorage.setItem("pm_facebook_id", facebook_id);
+ 					$(location).attr('href', 'index.html');
+ 				}).fail(function(jXHR, textStatus) {
+ 			 		if (textStatus === "timeout") {
+ 			 			console.log("Timeout exceeded!");
+ 			 			$.mobile.changePage('timeoutError.html', {
+ 			 				transition: 'pop',
+ 			 				role: 'dialog'
+ 			 			});
+ 			 		}
+ 			 	});
+ 		} else {
+ 			
+		 	window.localStorage.setItem("pm_facebook_id", facebook_id);
+			$(location).attr('href', 'index.html');
  		}
- 		window.localStorage.setItem("pm_facebook_id", facebook_id);
- 		console.log("bumbum");
- 		$(location).attr('href', 'index.html');
-
  	});
  }
