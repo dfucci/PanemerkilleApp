@@ -633,6 +633,7 @@
  	}).done(function(data) {
  		$("#picture_url").attr("src", data.picture_url);
  		var picture_url;
+ 		console.log(data.picture_url);
  		if ( data.picture_url == undefined ||  data.picture_url  == null ) 
  			picture_url = "images/facebookquestionmark.jpg"; 
  		else
