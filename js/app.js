@@ -5,6 +5,7 @@
  var platform;
 
  $('#FBLogout').live('tap', function() {
+	mixpanel.track("Logout");
  	$.mobile.loading('show', {
  		text: 'Logging you out...',
  		textVisible: true,
@@ -25,7 +26,8 @@
  });
 
  $('#btn-claimed').live('tap', function() {
-
+	 
+	mixpanel.track("Confirm claim"); 
  	var patch = getUrlVars()["id"];
  	$.ajax({
 		  type: "POST",
@@ -44,8 +46,8 @@
  });
 
 
- //TODO: fail()
  $('#parties-page').live('pageshow', function(event) {
+	mixpanel.track("Events list"); 
  	$.mobile.loading('show', {
  		text: 'Loading parties...',
  		textVisible: true,
@@ -75,6 +77,7 @@
 
  
  $('#yourpatches').live('pageshow', function(event) {
+	mixpanel.track("My patches list");
  	$.mobile.loading('show', {
  		text: 'Loading your patches...',
  		textVisible: true,
@@ -100,6 +103,7 @@
  });
 
  $('#yourcheckins').live('pageshow', function(event) {
+	mixpanel.track("My posters wall");
  	$.mobile.loading('show', {
  		text: 'Loading your posters...',
  		textVisible: true,
@@ -141,7 +145,7 @@
  	});
  	platform = device.platform;
  	$.mobile.pushStateEnabled = false;
- 	console.log('init');
+ 	mixpanel.track("App launch");
  	try {
  		FB.init({
  			appId: "366089376758944",
@@ -258,8 +262,9 @@
 
 
  function displayStream(prevPage) {
+	mixpanel.track("Stream");
  	$.mobile.loading('show', {
- 		text: 'Loading your friends list...',
+ 		text: 'Loading your friends...',
  		textVisible: true,
  		theme: 'a',
 
@@ -300,6 +305,7 @@
  }
 
  function displayCheckinStats(event) {
+	
  	$.mobile.loading('show', {
  		text: 'Loading your stats...',
  		textVisible: true,
@@ -525,6 +531,7 @@
  }
 
  function displayAllPatches(patches) {
+	mixpanel.track("All patches list");
  	$('#patchgrid').empty();
  	var blocks = ['a', 'b', 'c', 'd'];
 
@@ -581,6 +588,7 @@
  }
 
  function displayCheckin(data) {
+	mixpanel.track("Single poster");
  	$('#checkinH1').html(data.name);
  	var poster_big = buildBigImg(data.poster_url);
  	$('#checkinContent').html("<img src='" + poster_big + "' />");
@@ -589,6 +597,7 @@
  }
 
  $('#profile').live('pageshow', function() {
+	mixpanel.track("Profile");
  	$('#profile-content').hide();
  	$.mobile.loading('show',{
  		text: 'Loading your profile...',
@@ -696,6 +705,7 @@
  }
 
  $('#party').live('pageshow', function(event) {
+	mixpanel.track("Event info");
  	$.mobile.loading('show', {
  		text: 'Loading party info...',
  		textVisible: true,
@@ -779,6 +789,7 @@
 
 
  	$('#btnCheckin').one('tap', function(event) {
+ 		mixpanel.track("Checkin");
  		$.mobile.loading('show', {
  			text: 'Checking you in...',
  			textVisible: true,
@@ -872,6 +883,7 @@
  				$('#party-error').html('You have already checked in here.');
  				$('#party-error').show();
  				$.mobile.loading('hide');
+ 				mixpanel.track("Already here");
  				return;
  			}
  		}
@@ -891,6 +903,7 @@
  				$('#party-error').html('You have already checked in somewhere else recentely. Try again  ' + result);
  				$('#party-error').show();
  				$.mobile.loading('hide');
+ 				mixpanel.track("Already elsewhere");
  				return;
  			}
  		}
@@ -906,6 +919,7 @@
  			$('#party-error').html('This is not happening now.');
  			$('#party-error').show();
  			$.mobile.loading('hide');
+ 			mixpanel.track("Not now");
  			return;
  		}
 
@@ -936,9 +950,11 @@
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
  	if (distance <= maxDistance) {
+ 		mixpanel.track("Checkin enabled");
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
+ 		mixpanel.track("Too far");
  		$('#party-error').html('You seem to be too far from it. Get closer and try again.');
  		$('#party-error').show();
  	}
@@ -961,7 +977,7 @@
  }
 
  function onGPSError(err) {
- 	console.log(err);
+	 mixpanel.track("GPS error");
  	$.mobile.changePage('gpsError.html', {
  		transition: 'pop',
  		role: 'dialog'
@@ -1103,6 +1119,7 @@
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
  	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
  		if (data.length == 0) {
+ 			
  	 		$.ajax({
  				  type: "POST",
  				  url: endpoint + '/users',
@@ -1119,7 +1136,7 @@
  			 	  timeout: 10000
  			
  				}).done(function( data ) {
- 					
+ 					mixpanel.track("New user");
  				 	window.localStorage.setItem("pm_facebook_id", facebook_id);
  					$(location).attr('href', 'index.html');
  				}).fail(function(jXHR, textStatus) {
