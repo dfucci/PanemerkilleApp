@@ -638,6 +638,7 @@
  			picture_url = "images/facebookquestionmark.jpg"; 
  		else
  			picture_url = data.picture_url;
+ 		console.log(picture_url);
  		$("#profilePicture").html("<img id='profilePictureImg' src='" + picture_url + "'/>");
  		$("#firstname").html(data.name.firstname);
  		$("#surname").html(data.name.surname);
