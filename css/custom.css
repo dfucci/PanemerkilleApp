@@ -174,15 +174,17 @@ a:active {
 }
 .ui-icon-footbar-panemerkille-profile {
 	background-image: url("../images/footbar-panemerkille-profile.png");
+	
 	width: 36px!important;
 	height: 36px!important;
 	margin-left: -15px !important;
+	
 	background-color: transparent;
 	background-size: 36px 36px;
 }
 .ui-navbar .ui-btn-icon-top .ui-btn-inner {
-padding-top: 0px;
-height:53px;
+/*padding-top: 5px;*/
+height:15px;
 }
 
 .ui-icon-footbar-panemerkille-friends {

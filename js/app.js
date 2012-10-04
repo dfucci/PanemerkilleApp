@@ -1,12 +1,17 @@
  //var endpoint = "http://panemerkille.herokuapp.com";
-
  var user = {};
  var eventObj = {};
  var venueObj = {}; // TODO: refactor
  var platform;
- 
+
  $('#FBLogout').live('tap', function() {
- 	console.log('bye bye');
+	mixpanel.track("Logout");
+ 	$.mobile.loading('show', {
+ 		text: 'Logging you out...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
  	window.localStorage.clear();
  	FB.init({
  		appId: "366089376758944",
@@ -16,171 +21,271 @@
  	});
  	FB.logout(function(response) {
  		$.mobile.changePage('connect.html');
+ 		$.mobile.loading('hide');
  	});
  });
 
  $('#btn-claimed').live('tap', function() {
 	 
+	mixpanel.track("Confirm claim"); 
  	var patch = getUrlVars()["id"];
- 	//TODO: POST user.checkins.claimed = true
- 	$.post(endpoint + '/users/' + user.id + "/patches/" + patch, {
- 		claimed: 'true'
- 	});
- });
- 
+ 	$.ajax({
+		  type: "POST",
+		  url: endpoint + '/users/' + user.id + "/patches/" + patch,
+		  data: {claimed: 'true'},
+	 	  cache: false,
+	 	  timeout: 10000
+	
+		}).done(function( data ) {
+	 		console.log("Patch claimed");
+		}).fail(function(jXHR, textStatus) {
+			console.log("Error claiming a patch");
+	 	});
+ 	
 
- 
+ });
+
+
  $('#parties-page').live('pageshow', function(event) {
-	 $.ajax({ 			
-			url: endpoint + "/events",
-		 	type: "GET",
-		 	dataType: "json",
-		 	cache: false,
-	}).done(function(data){displayParties(data)});
-	 
-	populateUserFriends();
-	 
+	mixpanel.track("Events list"); 
+ 	$.mobile.loading('show', {
+ 		text: 'Loading parties...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
+ 	$.ajax({
+ 		url: endpoint + "/events",
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 	}).done(function(data) {
+ 		displayParties(data);
+ 		populateUserFriends();
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+
  });
 
+
+
+ 
  $('#yourpatches').live('pageshow', function(event) {
+	mixpanel.track("My patches list");
+ 	$.mobile.loading('show', {
+ 		text: 'Loading your patches...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
  	var id = getUrlVars()["user"];
- 	$.ajax({ 			
-		url: endpoint + "/users/" + user.id,
-	 	type: "GET",
-	 	dataType: "json",
-	 	cache: false,
- 	}).done(function(data){displayPatches(data)});
+ 	$.ajax({
+ 		url: endpoint + "/users/" + user.id,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 	}).done(function(data) {
+ 		displayPatches(data);
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
  });
 
  $('#yourcheckins').live('pageshow', function(event) {
- 	var id = getUrlVars()["user"];
- 	$.ajax({ 			
-		url: endpoint + "/users/"  + id,
-	 	type: "GET",
-	 	dataType: "json",
-	 	cache: false,
- 	}).done(function(data){displayCheckins(data)});
- });
+	mixpanel.track("My posters wall");
+ 	$.mobile.loading('show', {
+ 		text: 'Loading your posters...',
+ 		textVisible: true,
+ 		theme: 'a',
 
- 
+ 	});
+ 	var id = getUrlVars()["user"];
+ 	$.ajax({
+ 		url: endpoint + "/users/" + id,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 	}).done(function(data) {
+ 		displayCheckins(data);
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+ });
 
  $('#checkedin-page').live('pageshow', displayCheckinStats);
 
  $('#stream').live('pageshow', displayStream);
- 
 
- 
- 
+
+
  document.addEventListener('deviceready', init, false);
 
- 
  function init() {
-   platform = device.platform; 
-   $.mobile.pushStateEnabled = false; 
-   console.log('init');
-   try {
-     FB.init({
-       appId: "366089376758944",
-       nativeInterface: CDV.FB,
-       useCachedDialogs: false,
+ 	$.mobile.loading('show', {
+ 		text: 'Loading...',
+ 		textVisible: true,
+ 		theme: 'a',
 
-     });
-     console.log('1');
-     
-     var timeoutHandler = setTimeout(function() { requestFailed(); }, 1000);
+ 	});
+ 	platform = device.platform;
+ 	$.mobile.pushStateEnabled = false;
+ 	mixpanel.track("App launch");
+ 	try {
+ 		FB.init({
+ 			appId: "366089376758944",
+ 			nativeInterface: CDV.FB,
+ 			useCachedDialogs: false,
 
-	    function requestFailed() {
-	        // When this happens, it means that FB API was unresponsive
-	        alert('hey, FB API does not work!');
-	    }
+ 		});
+ 		var timeoutHandler = setTimeout(function() {
+ 			requestFailed();
+ 		}, 1000);
 
-	 FB.getLoginStatus(function(response) {
-	        clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
-	   		console.log('2');
-	        if (response.status === 'connected') {
-	          console.log('connesso');
-	         //var facebook_id = response.authResponse.userID;
-	         var facebook_id = window.localStorage.getItem('pm_facebook_id');
-	         console.log(facebook_id);
-	          if (!isUserInStorage()) {
-	            console.log('user not in storage');
-	            
-	            $.ajax({ 			
-	    			url: endpoint + "/users/",
-	    		 	type: "GET",
-	    		 	dataType: "json",
-	    		 	cache: false,
-	    		 	data: {facebook_id: facebook_id}
-	            }).done(function(data) {
-	              if (data) {
-	                user.id = data[0]._id;
-	                console.log(user.id);
-	                saveUserStorage(user.id);
-	                $.mobile.changePage('parties.html');
-	                // $(location).attr('href', 'parties.html');
-	              }
-	            });
-	          } else {
-	            user.id=window.localStorage.getItem("pm_user_id");    
-	            console.log('user in storage' + user.id);
-	            // $(location).attr('href', 'parties.html');
-	            $.mobile.changePage('parties.html');
-	          }
-	        } else {
-	          console.log('non connesso');
-	          $.mobile.changePage('connect.html');
-	        }  
-	    }, true);
-	 
-     
-   } catch (e) {
-     alert(e);
-   }
+ 		function requestFailed() {
+ 			// When this happens, it means that FB API was unresponsive
+ 			console.log('hey, FB API does not work!');
+ 		}
+
+ 		FB.getLoginStatus(function(response) {
+ 			clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
+ 			if (response.status === 'connected') {
+ 				console.log('connesso');
+ 				var facebook_id = window.localStorage.getItem('pm_facebook_id');
+ 				console.log(facebook_id);
+ 				if (!isUserInStorage()) {
+ 					console.log('user not in storage');
+
+ 					$.ajax({
+ 						url: endpoint + "/users/",
+ 						type: "GET",
+ 						dataType: "json",
+ 						cache: false,
+ 						timeout: 10000,
+ 						data: {
+ 							facebook_id: facebook_id
+ 						}
+ 					}).done(function(data) {
+ 						if (data.length>0) {
+ 							user.id = data[0]._id;
+ 							mixpanel.people.identify(user.id);
+ 							mixpanel.people.set({
+ 							    "$email": data[0].email,    
+ 							    "$created": data[0].registered,
+ 							    "$last_login": new Date(),        
+ 							    "gender": data[0].gender                   
+ 							});
+ 							saveUserStorage(user.id);
+ 							
+ 							$.mobile.changePage('parties.html');
+ 						} else {
+ 							FB.logout(function(response) {
+ 						 		$.mobile.changePage('connect.html');
+ 						 	});
+ 							
+ 						}
+ 						
+ 					}).fail(function(jXHR, textStatus) {
+ 						if (textStatus === "timeout") {
+ 							$.mobile.changePage('timeoutError.html', {
+ 								transition: 'pop',
+ 								role: 'dialog'
+ 							});
+ 						}
+ 						
+ 					});
+ 				} else {
+ 					user.id = window.localStorage.getItem("pm_user_id");
+ 					mixpanel.people.identify(user.id);
+ 					console.log('user in storage' + user.id);
+ 					$.mobile.changePage('parties.html');
+ 				}
+ 			} else {
+ 				console.log('non connesso');
+ 				$.mobile.changePage('connect.html');
+ 			}
+ 		}, true);
+
+
+ 	} catch (e) {
+ 		alert(e);
+ 	}
  }
- 
 
 
- $("#connect").live('pageinit', function() { //JQM
-	 FB.Event.subscribe('auth.login', function(response) {
-		   if (response.authResponse) {
-		      FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
-		        registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender,
-		         response.picture, response.email);
-		         console.log("/me callback");
-		      });
-		      console.log("/me after");
-		    } else {
-		      console.log('User cancelled login or did not fully authorize.');
-		    }
-		 });
-   console.log("pageshow connect");
-   FB.init({
-     appId: "366089376758944",
-     nativeInterface: CDV.FB,
-     useCachedDialogs: false,
 
-   });
+ $("#connect").live('pageinit', function() {
+ 	$.mobile.loading('show', {
+ 		text: 'Loading...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
+ 	FB.Event.subscribe('auth.login', function(response) {
+ 		if (response.authResponse) {
+ 			FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
+ 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, response.picture, response.email);			
+ 			});
+ 		} else {
+ 			console.log('User cancelled login or did not fully authorize.');
+ 		}
+ 	});
+ 	FB.init({
+ 		appId: "366089376758944",
+ 		nativeInterface: CDV.FB,
+ 		useCachedDialogs: false,
+
+ 	});
+ 	$.mobile.loading('hide');
+
  });
 
  $("#fbConnect").live('tap', function(e) {
-   $("#connecting").html("<img src='images/loader.gif' alt='loading'>");
-   FB.login(
-   function(response) {}, {
-     scope: "email, user_birthday, publish_actions, publish_stream"
-   });
+ 	$.mobile.loading('show', {
+ 		text: 'Logging you in...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
+ 	FB.login(function(response) {}, {
+ 		scope: "email, user_birthday, publish_actions, publish_stream"
+ 	});
  });
 
 
- 
+
  function displayStream(prevPage) {
-	
-	$.ajax({ 			
-			url: endpoint + "/users/" + user.id + "/friends",
-		 	type: "GET",
-		 	dataType: "json",
-		 	cache: false,
-	}).done(function(friends) {
+	mixpanel.track("Stream");
+ 	$.mobile.loading('show', {
+ 		text: 'Loading your friends...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
+ 	$.ajax({
+ 		url: endpoint + "/users/" + user.id + "/friends",
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 		timeout: 10000
+ 	}).done(function(friends) {
  		$("#streamContent").empty();
+ 		//TODO: check if there are no friends
  		for (var i = 0; i < friends.length; i++) {
  			var output = '';
  			var myTime = moment(friends[i].checkins[0].timestamp).fromNow();
@@ -194,22 +299,49 @@
  			$('#streamContent').append(output);
  			$('#listview-stream' + i).listview();
  		}
+ 		$.mobile.loading('hide');
 
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
  	});
  }
 
  function displayCheckinStats(event) {
+	
+ 	$.mobile.loading('show', {
+ 		text: 'Loading your stats...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
  	var eventID = getUrlVars()['event'];
  	$(".checkin-event").html(eventObj.name);
  	$(".checkin-venue").html(venueObj.name);
- 	
- 	$.ajax({ 			
-		url: endpoint + "/users/" + user.id,
-	 	type: "GET",
-	 	dataType: "json",
-	 	cache: false,
- 	}).done(function(data){updateCheckinsVenue(data)});
- 	
+
+ 	$.ajax({
+ 		url: endpoint + "/users/" + user.id,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 		timeout: 10000
+ 	}).done(function(data) {
+ 		updateCheckinsVenue(data)
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+
  	//$.getJSON(endpoint + '/users/' + user.id, updateCheckinsVenue);
  }
 
@@ -238,13 +370,13 @@
 
  		for (var i = 0; i < unseen.length; i++) {
  			var id = unseen[i].patch._id;
- 		 	$.ajax({ 			
+ 			$.ajax({
  				url: endpoint + "/patches/" + id,
- 			 	type: "GET",
- 			 	dataType: "json",
- 			 	cache: false,
- 		 	}).done(function(patch) {
-
+ 				type: "GET",
+ 				dataType: "json",
+ 				cache: false,
+ 				timeout: 10000
+ 			}).done(function(patch) {
  				var output = "";
  				output += '<li class="list-patch">';
  				output += '<a href="patch.html?id=' + patch._id + '&claimed=false">';
@@ -257,20 +389,32 @@
  				if (unseen.length == count) {
  					$('#liview-checkin').listview('refresh');
  				}
+
+ 				$.mobile.loading('hide');
+ 			}).fail(function(jXHR, textStatus) {
+ 				if (textStatus === "timeout") {
+ 					console.log("Timeout exceeded!");
+ 					$.mobile.changePage('timeoutError.html', {
+ 						transition: 'pop',
+ 						role: 'dialog'
+ 					});
+ 				}
  			});
  		};
  	}
+
+
  }
 
  function displayParties(data) { // TODO: refactor
-	
-	console.log("displayParties"); 
-	
  	var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
+ 	boilerplate += "<li data-role='list-divider' id='li-tomorrow'>Tomorrow</li>";
  	boilerplate += "<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
  	$('#parties-listview').html(boilerplate);
  	var noPartyToday = true;
+ 	var noPartyTomorrow = true;
  	var noPartyUpcoming = true;
+ 	
  	$.each(data.reverse(), function(index, party) {
  		var out = '';
  		var sTime = moment(party.time.start).toDate();
@@ -282,11 +426,20 @@
  		if (party.venue.featured) {
  			featured += "<img class='featured' src='images/corner.png'/>";
  		}
- 		if ((isToday(sTime)) || (isGoingOn(sTime, sEnd))) {
+ 		if (isGoingOn(sTime, sEnd)) {
+ 			noPartyToday = false;
+ 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
+ 			$('#li-today').after(out);
+ 		} else if (isToday(sTime)) 	{
  			noPartyToday = false;
  			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-today').after(out);
- 		} else {
+ 		} else if (isTomorrow(sTime)) {	
+ 			noPartyTomorrow = false;
+ 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			$('#li-tomorrow').after(out);
+ 			
+ 		} else  {
  			noPartyUpcoming = false;
  			var today = new Date();
  			var tomorrow = new Date();
@@ -301,15 +454,20 @@
  	if (noPartyToday) {
  		$('#li-today').after("<li><p  class='italic no-event'>Unfortunately there's nothing going on tonight. </p><p class='italic no-event'>Take some time to sew your patches ;)</p></li>");
  	}
+ 	if (noPartyTomorrow) {
+ 		$('#li-today').after("<li><p  class='italic no-event'>Unfortunately there's nothing planned for tomorrow. </p><p class='italic no-event'> Yet.</p></li>");
+ 	}
  	if (noPartyUpcoming) {
  		$('#li-upcoming').after("<li><p  class='italic no-event'>Unfortunately there are no upcoming events. </p><p class='italic no-event'>It might be the right time to take have rest :)</p></li>");
 
  	}
  	$("#parties-listview").listview('refresh');
+
+ 	$.mobile.loading('hide');
  }
 
 
- 
+
  function trailingZero(time) {
  	if (time < 10) {
  		time = "0" + time.toString();
@@ -341,55 +499,56 @@
 
  function displayCheckins(data) {
  	var checkins = data.checkins;
- 	if (checkins.length>0){
- 	var blocks = ['a', 'b', 'c', 'd'];
- 	$.each(
- 	checkins, function(index, c) {
- 		var event_id = c.event._id;
- 		var event_name = c.event.name;
- 		var event_poster = c.event.poster_url;
- 		var k = index % 4;
- 		var cls = "ui-block-" + blocks[k];
- 		$('#checkingrid').append('<div class=' + cls + '> <a href="userCheckin.html?id=' + event_id + '" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
- 	});
+ 	if (checkins.length > 0) {
+ 		var blocks = ['a', 'b', 'c', 'd'];
+ 		$.each(
+ 		checkins, function(index, c) {
+ 			var event_id = c.event._id;
+ 			var event_name = c.event.name;
+ 			var event_poster = c.event.poster_url;
+ 			var k = index % 4;
+ 			var cls = "ui-block-" + blocks[k];
+ 			$('#checkingrid').append('<div class=' + cls + '> <a href="userCheckin.html?id=' + event_id + '" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
+ 		});
  	} else {
  		$('#yourcheckins-content').append('<p class="italic">It looks pretty empty around here. Attend some party and watch your poster wall filling up ;)</p>');
  	}
+ 	$.mobile.loading('hide');
+
  }
 
  function displayPatches(data) {
  	var patches = data.patches;
- 	if (patches.length>0){
- 	console.log(patches);
- 	var blocks = ['a', 'b', 'c', 'd'];
- 	$('#patchgrid').empty();
- 	$.each(
- 	patches, function(index, p) {
- 		var patch_name = p.patch.name;
- 		var patch_image = p.patch.image_url;
- 		var patch_id = p.patch._id;
- 		var k = index % 4;
- 		var cls = "ui-block-" + blocks[k];
- 		$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '&claimed=' + p.claimed + '" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
- 	});
- } else {
- 	$('#yourpatches-content').append('<p class="italic">It looks pretty empty around here. Attend some party and collect awesome patches ;)</p>');
- }
+ 	if (patches.length > 0) {
+ 		console.log(patches);
+ 		var blocks = ['a', 'b', 'c', 'd'];
+ 		$('#patchgrid').empty();
+ 		$.each(
+ 		patches, function(index, p) {
+ 			var patch_name = p.patch.name;
+ 			var patch_image = p.patch.image_url;
+ 			var patch_id = p.patch._id;
+ 			var k = index % 4;
+ 			var cls = "ui-block-" + blocks[k];
+ 			$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '&claimed=' + p.claimed + '" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
+ 		});
+ 	} else {
+ 		$('#yourpatches-content').append('<p class="italic">It looks pretty empty around here. Attend some party and collect awesome patches ;)</p>');
+ 	}
+ 	$.mobile.loading('hide');
  }
 
  function displayAllPatches(patches) {
-
-	console.log("displayAllPatches");
-	console.log(patches.length);
-
+	mixpanel.track("All patches list");
  	$('#patchgrid').empty();
  	var blocks = ['a', 'b', 'c', 'd'];
 
- 	$.ajax({ 			
-		url: endpoint + "/users/" + user.id,
-	 	type: "GET",
-	 	dataType: "json",
-	 	cache: false,
+ 	$.ajax({
+ 		url: endpoint + "/users/" + user.id,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 		timeout: 10000
  	}).done(function(user) {
 
  		userPatches = new Array();
@@ -423,28 +582,43 @@
  			}
  			$('#patchgrid').append('<div class="' + cls + '"><a href="' + href + '" data-transition="none"> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/></div></a></div>');
  		});
-
-
-
+ 		$.mobile.loading('hide');
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
  	});
 
  }
 
  function displayCheckin(data) {
+	mixpanel.track("Single poster");
  	$('#checkinH1').html(data.name);
  	var poster_big = buildBigImg(data.poster_url);
  	$('#checkinContent').html("<img src='" + poster_big + "' />");
+ 	$.mobile.loading('hide');
+
  }
 
- $('#profile').live('pagebeforeshow', function() {
+ $('#profile').live('pageshow', function() {
+	mixpanel.track("Profile");
+ 	$('#profile-content').hide();
+ 	$.mobile.loading('show',{
+ 		text: 'Loading your profile...',
+		textVisible: true,
+		theme: 'a',
+ 	});
  	populateUser(user.id);
  });
- 
+
 
  function isUserInStorage() {
  	// var facebook_id = window.localStorage.getItem("pm_facebook_id");
  	var user_id = window.localStorage.getItem("pm_user_id");
- 	console.log('checkin user' + user_id);
  	return user_id != null;
 
  }
@@ -457,15 +631,22 @@
  function populateUser(userid) {
  	$("#userPatchesLink").attr('href', 'userPatches.html?user=' + userid);
  	$("#userCheckinLink").attr('href', 'userCheckins.html?user=' + userid);
- 	 
- 	$.ajax({ 			
- 			url: endpoint + "/users/" + userid,
- 		 	type: "GET",
- 		 	dataType: "json",
- 		 	cache: false,
+
+ 	$.ajax({
+ 		url: endpoint + "/users/" + userid,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 		timeout: 10000
  	}).done(function(data) {
- 		$("#picture_url").attr("src", data.picture_url);
- 		$("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
+ 		var picture_url;
+ 		console.log(data.picture_url);
+ 		if ( data.picture_url == undefined ||  data.picture_url  == null ) 
+ 			picture_url = "images/facebookquestionmark.jpg"; 
+ 		else
+ 			picture_url = data.picture_url;
+ 		console.log(picture_url);
+ 		$("#profilePicture").html("<img id='profilePictureImg' src='" + picture_url + "'/>");
  		$("#firstname").html(data.name.firstname);
  		$("#surname").html(data.name.surname);
  		$("#patch_counter").html(data.patches.length);
@@ -476,36 +657,60 @@
  			width: 100,
  			vertical: 'top'
  		});
+ 		$('#profile-content').show();
+ 		 $.mobile.loading('hide');
+
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
  	});
  }
 
 
  function populateUserFriends() {
- 	console.log('populateUserFriends');
  	FB.init({
  		appId: "366089376758944",
  		nativeInterface: CDV.FB,
  		useCachedDialogs: false,
  	});
+	console.log('populateUserFriends');
  	FB.getLoginStatus(function(response) {
  		if (response.status == 'connected') {
+ 			console.log("Retrieving user friends");
  			var pmFriends = new Array();
  			FB.api('/me/friends', {
  				fields: 'installed'
  			}, function(res) {
- 				if (res.error) console.log(res.error);
+ 	 			console.log("Answer received");
+ 				if (res.error) console.log(res.error.message);
  				else {
+ 		 			console.log("I have got the user friends");
  					for (var i = 0; i < res.data.length; i++) {
  						if (typeof res.data[i].installed != "undefined") {
  							pmFriends.push(res.data[i]);
  						}
  					}
  					var friendsParameter = JSON.stringify(pmFriends);
- 					$.post(endpoint + "/users/" + user.id + "/friends", {
- 						friends: friendsParameter
- 					}, function(data) {
- 						console.log(data);
- 					});
+ 					$.ajax({
+ 						  type: "POST",
+ 						  url: endpoint + "/users/" + user.id + "/friends",
+ 						  data: {friends: friendsParameter},
+ 					 	  cache: false,
+ 					 	  timeout: 10000
+ 					
+ 						}).done(function( data ) {
+ 							console.log(data);
+ 						}).fail(function(){
+ 							console.log("Error posting user friends");
+ 						});
+ 					
+ 					
+
  				}
  			});
 
@@ -514,23 +719,36 @@
  }
 
  $('#party').live('pageshow', function(event) {
+	mixpanel.track("Event info");
+ 	$.mobile.loading('show', {
+ 		text: 'Loading party info...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
+ 	$("#party-content").hide();
  	var id = getUrlVars()['id'];
- 	
- 	$.ajax({ 			
-			url: endpoint + '/events/' + id,
-		 	type: "GET",
-		 	dataType: "json",
-		 	cache: false,
-	}).done(function(data) {
-		displayParty(data);
-	}); 
- 	
+ 	$.ajax({
+ 		url: endpoint + '/events/' + id,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 		timeout: 10000
+ 	}).done(function(data) {
+ 		displayParty(data);
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+
  });
 
  function displayParty(data) {
-	
-	console.log("single party");
-	console.log(data.name);
  	$('#party-header h1').html(data.name);
  	$('#posterImg').attr('src', data.poster_url);
  	$('#party-venue').html(data.venue.name);
@@ -579,48 +797,62 @@
  	eventObj.name = data.name;
  	enableCheckinBtn();
  	displayPartyAttenders(data.attenders);
- 	
- 	
- 	//var clicked = false;
-	$('#btnCheckin').one('tap', function(event) {
-		    console.log("Click!")
-		   /* if(clicked){
-		    	return;
-		    }*/
-		    clicked = true;
-		 	var eventid = getUrlVars()['id'];
-		 	console.log('button checkin tapped');
-		 	if ($('input[name=checkbox-0]').is(':checked')) {
-		 		console.log('fb status');
-		 		var party = $('#party-header h1').text();
-		 		var image = $('#posterImg').attr('src');
-		 		var place = $('#party-venue').text();
-		 		var description = $('#party-desc').text();
-		 		FB.api('/me/feed', 'post', {
-		 			message: 'I am partying at ' + party + " at " + place,
-		 			picture: image,
-		 			link: 'http://www.panemerkille.fi',
-		 			name: party,
-		 			caption: "at " + place,
-		 			description: description
-		 		}, function(response) {
-		 			if (!response || response.error) console.log('Error while posting on Facebook');
-		 			else console.log('Post successfull');
-		 		});
-		 	}
+ 	$("#party-content").show();
+ 	$.mobile.loading('hide');
+
+
+
+ 	$('#btnCheckin').one('tap', function(event) {
+ 		mixpanel.track("Checkin");
+ 		$.mobile.loading('show', {
+ 			text: 'Checking you in...',
+ 			textVisible: true,
+ 			theme: 'a',
+
+ 		});
+ 		clicked = true;
+ 		var eventid = getUrlVars()['id'];
+ 		console.log('button checkin tapped');
+ 		if ($('input[name=checkbox-0]').is(':checked')) {
+ 			console.log('fb status');
+ 			var party = $('#party-header h1').text();
+ 			var image = $('#posterImg').attr('src');
+ 			var place = $('#party-venue').text();
+ 			var description = $('#party-desc').text();
+ 			FB.api('/me/feed', 'post', {
+ 				message: 'I am partying at ' + party + " at " + place,
+ 				picture: image,
+ 				link: 'http://www.panemerkille.fi',
+ 				name: party,
+ 				caption: "at " + place,
+ 				description: description
+ 			}, function(response) {
+ 				if (!response || response.error) console.log('Error while posting on Facebook');
+ 				else console.log('Post successfull');
+ 			});
+ 		}
+ 		$.ajax({
+			  type: "POST",
+			  url: endpoint + '/users/' + user.id + '/checkins',
+			  data: {event: eventid},
+		 	  cache: false,
+		 	  timeout: 10000
 		
-		 	$.post(endpoint + '/users/' + user.id + '/checkins', {
-		 		event: eventid
-		 	}, function(data) {
-		 		$.mobile.changePage('checkin.html?event=' + eventid);
-		 		//clicked = false;
+			}).done(function( data ) {
+				$.mobile.changePage('checkin.html?event=' + eventid);
+			}).fail(function(jXHR, textStatus) {
+		 		if (textStatus === "timeout") {
+		 			console.log("Timeout exceeded!");
+		 			$.mobile.changePage('timeoutError.html', {
+		 				transition: 'pop',
+		 				role: 'dialog'
+		 			});
+		 		}
 		 	});
-		    
-	});
- 	
- 	
- 	
- }
+
+
+ 	});
+}
 
 
  function displayPartyAttenders(attenders) {
@@ -643,22 +875,39 @@
  }
 
  function enableCheckinBtn() {
+ 	$.mobile.loading('show', {
+ 		text: 'Looking for duplicates...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
  	var eventID = getUrlVars()['id'];
- 	$.ajax({ 			
-		url: endpoint + "/users/" + user.id,
-	 	type: "GET",
-	 	dataType: "json",
-	 	cache: false,
- 	}).done(function(data){
+ 	$.ajax({
+ 		url: endpoint + "/users/" + user.id,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 		timeout: 10000
+ 	}).done(function(data) {
+
  		for (var i = 0; i < data.checkins.length; i++) {
  			console.log(data.checkins[i].event._id);
+ 			console.log('done for');
  			if (data.checkins[i].event._id == eventID) { //check if the user checked in at the same event
  				$('#party-error').html('You have already checked in here.');
  				$('#party-error').show();
+ 				$.mobile.loading('hide');
+ 				mixpanel.track("Already here");
  				return;
  			}
  		}
  		if (data.checkins.length > 0) {
+ 			$.mobile.loading('show', {
+ 				text: 'Checking your history...',
+ 				textVisible: true,
+ 				theme: 'a',
+
+ 			});
  			var lastCheckin = moment(data.checkins[data.checkins.length - 1].timestamp);
  			var now = moment();
  			var diff = now.diff(lastCheckin, 'minutes');
@@ -667,21 +916,46 @@
  				var result = lastCheckin.add('minutes', 120).fromNow();
  				$('#party-error').html('You have already checked in somewhere else recentely. Try again  ' + result);
  				$('#party-error').show();
+ 				$.mobile.loading('hide');
+ 				mixpanel.track("Already elsewhere");
  				return;
  			}
  		}
+ 		$.mobile.loading('show', {
+ 			text: 'Checking party time...',
+ 			textVisible: true,
+ 			theme: 'a',
+
+ 		});
 
  		var day = $('#day').text();
  		if (day != 'Now') { //event has not started yet
  			$('#party-error').html('This is not happening now.');
  			$('#party-error').show();
+ 			$.mobile.loading('hide');
+ 			mixpanel.track("Not now");
  			return;
  		}
+
+ 		$.mobile.loading('show', {
+ 			text: 'Checking your location...',
+ 			textVisible: true,
+ 			theme: 'a',
+
+ 		});
  		navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError, {
-			enableHighAccuracy: true,
-			maxiumAge: 60000,
-			timeout: 15000
-	 });
+ 			enableHighAccuracy: true,
+ 			maxiumAge: 60000,
+ 			timeout: 15000
+ 		});
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
  	});
  }
 
@@ -689,18 +963,19 @@
  	var myLat = pos.coords.latitude;
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
- 	if (distance <= maxDistance) { 
+ 	if (distance <= maxDistance) {
+ 		mixpanel.track("Checkin enabled");
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
+ 		mixpanel.track("Too far");
  		$('#party-error').html('You seem to be too far from it. Get closer and try again.');
  		$('#party-error').show();
  	}
-
+ 	$.mobile.loading('hide');
  }
- 
- 
-  
+
+
 
  function haversine(lon1, lat1, lon2, lat2) {
  	var R = 6371; // km
@@ -716,8 +991,11 @@
  }
 
  function onGPSError(err) {
- 	console.log(err);
- 	$.mobile.changePage('gpsError.html', {transition: 'pop', role: 'dialog'});
+	 mixpanel.track("GPS error");
+ 	$.mobile.changePage('gpsError.html', {
+ 		transition: 'pop',
+ 		role: 'dialog'
+ 	});
  	//$('#party-error').html('There is a problem finding your current location');
  	//$('#party-error').show();
  }
@@ -725,15 +1003,31 @@
  function toRad(deg) {
  	return deg * Math.PI / 180;
  }
- 
+
  $('#patches').live('pageshow', function(event) {
-	 console.log('live patches');
-	 $.ajax({
-			url: endpoint + '/patches/',
-		 	type: "GET",
-		 	dataType: "json",
-		 	cache: true,
-	 }).done(function(data){displayAllPatches(data)});
+ 	$.mobile.loading('show', {
+ 		text: 'Loading all patches...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
+ 	$.ajax({
+ 		url: endpoint + '/patches/',
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: true,
+ 		timeout: 10000
+ 	}).done(function(data) {
+ 		displayAllPatches(data)
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
  });
 
  // $('#patch').live('pageshow', function(event) {
@@ -741,6 +1035,12 @@
  // 	$.getJSON(endpoint + '/patches/' + id, displayPatch)
  // });
  $('#patch').live('pageshow', function(event, ui) {
+ 	$.mobile.loading('show', {
+ 		text: 'Loading patch info...',
+ 		textVisible: true,
+ 		theme: 'a',
+
+ 	});
  	if (ui.prevPage[0].id != 'checkedin-page') {
  		$('#patch-back').show();
  		$('#patch-done').hide();
@@ -757,42 +1057,62 @@
  	}
  	var patch = vars['id'];
  	var claimed = vars['claimed'];
- 	$.ajax({ 			
-		url: endpoint + '/patches/'+ patch,
-	 	type: "GET",
-	 	dataType: "json",
-	 	cache: false,
+ 	$.ajax({
+ 		url: endpoint + '/patches/' + patch,
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 		timeout: 10000
  	}).done(function(data) {
  		$('#patchH1').html(data.name);
  		var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
  		$('#patchContent').html(output);
  		if (claimed == 'false') {
- 			$('#patchContent').append('<p>Woah! Show this virtual patch to the staff to get a real one and then tap the button!</p><a data-role="button" data-icon="check" data-theme="b" data-rel="dialog" href="claimPatch.html?id="'+patch +' id="btn-dialog-claimed">OK, I got my real patch!</a>');
+ 			$('#patchContent').append('<p>Woah! Show this virtual patch to the staff to get a real one and then tap the button!</p><a data-role="button" data-icon="check" data-theme="b" data-rel="dialog" href="claimPatch.html?id="' + patch + ' id="btn-dialog-claimed">OK, I got my real patch!</a>');
  			$('#btn-dialog-claimed').button();
+ 		}
+ 		$.mobile.loading('hide');
+
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
  		}
  	});
  });
 
  $('#checkin').live('pageshow', function(event) {
- 	var id = getUrlVars()["id"];
- 	
- 	$.ajax({ 			
-		url: endpoint + "/events/" + id,
-	 	type: "GET",
-	 	dataType: "json",
-	 	cache: false,
- 	}).done(function(data){displayCheckin(data)});
- 
- });
- 
+ 	$.mobile.loading('show', {
+ 		text: 'Loading poster...',
+ 		textVisible: true,
+ 		theme: 'a',
 
- var onGPSRetrySuccess = function() {
-	 	//$.mobile.changePage('parties.html');
- }
- var onGPSRetryError = function() {
-	 	//$.mobile.changePage('gpsError.html');
-}
- 
+ 	});
+ 	var id = getUrlVars()["id"];
+ 	$.ajax({
+ 		url: endpoint + "/events/" + id,
+ 		type: "GET",
+ 		dataType: "json",
+ 		timeout: 10000,
+ 		cache: false
+ 	}).done(function(data) {
+ 		displayCheckin(data)
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			console.log("Timeout exceeded!");
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+
+ });
+
+
  function getUrlVars() {
  	var vars = [],
  		hash;
@@ -811,23 +1131,41 @@
  }
 
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
- 	console.log("checking user" + facebook_id);
  	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
- 		if (data.length < 1) {
- 			$.post(endpoint + '/users', {
- 				facebook_id: facebook_id,
- 				firstname: firstname,
- 				surname: surname,
- 				birthdate: birthdate,
- 				gender: gender,
- 				picture_url: picture_url,
- 				email: email
- 			});
-
+ 		if (data.length == 0) {
+ 			
+ 	 		$.ajax({
+ 				  type: "POST",
+ 				  url: endpoint + '/users',
+ 				  data: {
+ 		 				facebook_id: facebook_id,
+ 		 				firstname: firstname,
+ 		 				surname: surname,
+ 		 				birthdate: birthdate,
+ 		 				gender: gender,
+ 		 				picture_url: picture_url,
+ 		 				email: email
+ 		 		  },
+ 			 	  cache: false,
+ 			 	  timeout: 10000
+ 			
+ 				}).done(function( data ) {
+ 					mixpanel.track("New user");
+ 				 	window.localStorage.setItem("pm_facebook_id", facebook_id);
+ 					$(location).attr('href', 'index.html');
+ 				}).fail(function(jXHR, textStatus) {
+ 			 		if (textStatus === "timeout") {
+ 			 			console.log("Timeout exceeded!");
+ 			 			$.mobile.changePage('timeoutError.html', {
+ 			 				transition: 'pop',
+ 			 				role: 'dialog'
+ 			 			});
+ 			 		}
+ 			 	});
+ 		} else {
+ 			
+		 	window.localStorage.setItem("pm_facebook_id", facebook_id);
+			$(location).attr('href', 'index.html');
  		}
- 		window.localStorage.setItem("pm_facebook_id", facebook_id);
- 		console.log("bumbum");
- 		$(location).attr('href', 'index.html');
-
  	});
  }
