@@ -188,7 +188,9 @@
  							    "$email": data[0].email,    
  							    "$created": data[0].registered,
  							    "$last_login": new Date(),        
- 							    "gender": data[0].gender                   
+ 							    "gender": data[0].gender,
+ 							    "$first_name": data[0].name.firstname,
+ 							    "$last_name": data[0].name.surname
  							});
  							saveUserStorage(user.id);
  							
