@@ -145,7 +145,6 @@
  	});
  	platform = device.platform;
  	$.mobile.pushStateEnabled = false;
- 	mixpanel.track("App launch");
  	try {
  		FB.init({
  			appId: "366089376758944",
@@ -192,6 +191,8 @@
  							    "$first_name": data[0].name.firstname,
  							    "$last_name": data[0].name.surname
  							});
+ 						 	mixpanel.track("App launch");
+
  							saveUserStorage(user.id);
  							
  							$.mobile.changePage('parties.html');
@@ -213,7 +214,7 @@
  					});
  				} else {
  					user.id = window.localStorage.getItem("pm_user_id");
- 					mixpanel.people.identify(user.id);
+ 					mixpanel.track("App launch");
  					console.log('user in storage' + user.id);
  					$.mobile.changePage('parties.html');
  				}
