@@ -242,7 +242,13 @@
  	FB.Event.subscribe('auth.login', function(response) {
  		if (response.authResponse) {
  			FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
- 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, response.picture, response.email);			
+ 		 		var picture_url;
+ 		 		
+ 		 		if ( response.picture == undefined ||  response.picture  == null ) 
+ 		 			picture_url = "https://s3-eu-west-1.amazonaws.com/panemerkille/unknown-user.gif"; 
+ 		 		else
+ 		 			picture_url = response.picture;
+ 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, picture_url, response.email);			
  			});
  		} else {
  			console.log('User cancelled login or did not fully authorize.');
@@ -642,14 +648,8 @@
  		cache: false,
  		timeout: 10000
  	}).done(function(data) {
- 		var picture_url;
- 		console.log(data.picture_url);
- 		if ( data.picture_url == undefined ||  data.picture_url  == null ) 
- 			picture_url = "images/facebookquestionmark.jpg"; 
- 		else
- 			picture_url = data.picture_url;
- 		console.log(picture_url);
- 		$("#profilePicture").html("<img id='profilePictureImg' src='" + picture_url + "'/>");
+
+ 		$("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
  		$("#firstname").html(data.name.firstname);
  		$("#surname").html(data.name.surname);
  		$("#patch_counter").html(data.patches.length);
