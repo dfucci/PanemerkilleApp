@@ -1,8 +1,9 @@
- //var endpoint = "http://panemerkille.herokuapp.com";
  var user = {};
  var eventObj = {};
- var venueObj = {}; // TODO: refactor
- var platform;
+ var venueObj = {};
+ var initiated = false;
+ 
+ 
 
  $('#FBLogout').live('tap', function() {
 	mixpanel.track("Logout");
@@ -13,12 +14,6 @@
 
  	});
  	window.localStorage.clear();
- 	FB.init({
- 		appId: "366089376758944",
- 		nativeInterface: CDV.FB,
- 		useCachedDialogs: false,
-
- 	});
  	FB.logout(function(response) {
  		$.mobile.changePage('connect.html');
  		$.mobile.loading('hide');
@@ -26,8 +21,7 @@
  });
 
  $('#btn-claimed').live('tap', function() {
-	 
-	mixpanel.track("Confirm claim"); 
+	mixpanel.track("Patch claimed", {"patch" : patch});
  	var patch = getUrlVars()["id"];
  	$.ajax({
 		  type: "POST",
@@ -47,8 +41,8 @@
 
 
  $('#parties-page').live('pageshow', function(event) {
-	mixpanel.track("Events list"); 
- 	$.mobile.loading('show', {
+		mixpanel.track("PageView", {"page" : "Events list"});
+		$.mobile.loading('show', {
  		text: 'Loading parties...',
  		textVisible: true,
  		theme: 'a',
@@ -77,7 +71,7 @@
 
  
  $('#yourpatches').live('pageshow', function(event) {
-	mixpanel.track("My patches list");
+	mixpanel.track("PageView", {"page" : "My patches list"});
  	$.mobile.loading('show', {
  		text: 'Loading your patches...',
  		textVisible: true,
@@ -103,7 +97,7 @@
  });
 
  $('#yourcheckins').live('pageshow', function(event) {
-	mixpanel.track("My posters wall");
+	mixpanel.track("PageView", {"page" : "My poster wall"});
  	$.mobile.loading('show', {
  		text: 'Loading your posters...',
  		textVisible: true,
@@ -135,104 +129,124 @@
 
 
  document.addEventListener('deviceready', init, false);
-
+ 
+ $('#index').live('pageshow', loadIndex);
+ 
+function loadIndex(){
+	console.log('inside loadIndex');
+	if (initiated){
+		console.log('is initiated');
+	 	$.mobile.loading('show', {
+	 		text: 'Loading...',
+	 		textVisible: true,
+	 		theme: 'a',
+	 	});
+	 	var timeoutHandler = setTimeout(function() {
+				requestFailed();
+		}, 1000);
+	
+		function requestFailed() {
+			console.log('hey, FB API does not work!');
+		}
+	
+		FB.getLoginStatus(function(response) {
+				clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
+				if (response.status === 'connected') {
+					console.log('connesso');
+					var facebook_id = window.localStorage.getItem('pm_facebook_id');
+					console.log(facebook_id);
+					if (!isUserInStorage()) {
+						console.log('user not in storage');
+	
+						$.ajax({
+							url: endpoint + "/users/",
+							type: "GET",
+							dataType: "json",
+							cache: false,
+							timeout: 10000,
+							data: {
+								facebook_id: facebook_id
+							}
+						}).done(function(data) {
+							if (data.length>0) {
+								user.id = data[0]._id;
+								var age = getAge(data[0].birthdate);
+								mixpanel.identify(user.id);
+								mixpanel.name_tag(user.id);
+								
+								mixpanel.register({
+									"age": age,
+								    "gender": data[0].gender,
+								    "name": data[0].name.firstname + " " + data[0].name.surname
+								});
+								mixpanel.people.identify(user.id);
+								mixpanel.people.set({
+								    "$email": data[0].email,    
+								    "$created": data[0].registered,
+								    "$last_login": new Date(),        
+								    "gender": data[0].gender,
+								    "age": age,
+								    "$first_name": data[0].name.firstname,
+								    "$last_name": data[0].name.surname
+								});
+							 	mixpanel.track("App launch");
+	
+								saveUserStorage(user.id);
+								
+								$.mobile.changePage('parties.html');
+							} else {
+								FB.logout(function(response) {
+							 		$.mobile.changePage('connect.html');
+							 	});
+								
+							}
+							
+						}).fail(function(jXHR, textStatus) {
+							if (textStatus === "timeout") {
+								$.mobile.changePage('timeoutError.html', {
+									transition: 'pop',
+									role: 'dialog'
+								});
+							}
+							
+						});
+					} else {
+						user.id = window.localStorage.getItem("pm_user_id");
+						mixpanel.track("App launch");
+						mixpanel.register({"last_login": new Date()});
+						mixpanel.name_tag(user.id);
+						mixpanel.people.set({"$last_login": new Date()});
+						console.log('user in storage' + user.id);
+						$.mobile.changePage('parties.html');
+					}
+				} else {
+					console.log('non connesso');
+					$.mobile.changePage('connect.html');
+				}
+			}, true);
+	}
+}
+ 
+ 
  function init() {
- 	$.mobile.loading('show', {
- 		text: 'Loading...',
- 		textVisible: true,
- 		theme: 'a',
-
- 	});
- 	platform = device.platform;
+	 
+	console.log("init");
  	$.mobile.pushStateEnabled = false;
- 	try {
- 		FB.init({
+	FB.init({
  			appId: "366089376758944",
  			nativeInterface: CDV.FB,
  			useCachedDialogs: false,
 
- 		});
- 		var timeoutHandler = setTimeout(function() {
- 			requestFailed();
- 		}, 1000);
-
- 		function requestFailed() {
- 			// When this happens, it means that FB API was unresponsive
- 			console.log('hey, FB API does not work!');
- 		}
-
- 		FB.getLoginStatus(function(response) {
- 			clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
- 			if (response.status === 'connected') {
- 				console.log('connesso');
- 				var facebook_id = window.localStorage.getItem('pm_facebook_id');
- 				console.log(facebook_id);
- 				if (!isUserInStorage()) {
- 					console.log('user not in storage');
-
- 					$.ajax({
- 						url: endpoint + "/users/",
- 						type: "GET",
- 						dataType: "json",
- 						cache: false,
- 						timeout: 10000,
- 						data: {
- 							facebook_id: facebook_id
- 						}
- 					}).done(function(data) {
- 						if (data.length>0) {
- 							user.id = data[0]._id;
- 							mixpanel.people.identify(user.id);
- 							mixpanel.people.set({
- 							    "$email": data[0].email,    
- 							    "$created": data[0].registered,
- 							    "$last_login": new Date(),        
- 							    "gender": data[0].gender,
- 							    "$first_name": data[0].name.firstname,
- 							    "$last_name": data[0].name.surname
- 							});
- 						 	mixpanel.track("App launch");
-
- 							saveUserStorage(user.id);
- 							
- 							$.mobile.changePage('parties.html');
- 						} else {
- 							FB.logout(function(response) {
- 						 		$.mobile.changePage('connect.html');
- 						 	});
- 							
- 						}
- 						
- 					}).fail(function(jXHR, textStatus) {
- 						if (textStatus === "timeout") {
- 							$.mobile.changePage('timeoutError.html', {
- 								transition: 'pop',
- 								role: 'dialog'
- 							});
- 						}
- 						
- 					});
- 				} else {
- 					user.id = window.localStorage.getItem("pm_user_id");
- 					mixpanel.track("App launch");
- 					console.log('user in storage' + user.id);
- 					$.mobile.changePage('parties.html');
- 				}
- 			} else {
- 				console.log('non connesso');
- 				$.mobile.changePage('connect.html');
- 			}
- 		}, true);
-
-
- 	} catch (e) {
- 		alert(e);
- 	}
+ 	});
+	initiated = true;
+	loadIndex();
+ 	
  }
 
 
 
  $("#connect").live('pageinit', function() {
+	console.log("connect");
  	$.mobile.loading('show', {
  		text: 'Loading...',
  		textVisible: true,
@@ -240,20 +254,22 @@
 
  	});
  	FB.Event.subscribe('auth.login', function(response) {
+ 		console.log("login");
  		if (response.authResponse) {
  			FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
- 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, response.picture, response.email);			
+ 		 		var picture_url;
+ 		 		
+ 		 		if ( response.picture == undefined ||  response.picture  == null ) 
+ 		 			picture_url = "https://s3-eu-west-1.amazonaws.com/panemerkille/unknown-user.gif"; 
+ 		 		else
+ 		 			picture_url = response.picture;
+ 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, picture_url, response.email);			
  			});
  		} else {
  			console.log('User cancelled login or did not fully authorize.');
  		}
  	});
- 	FB.init({
- 		appId: "366089376758944",
- 		nativeInterface: CDV.FB,
- 		useCachedDialogs: false,
-
- 	});
+ 	
  	$.mobile.loading('hide');
 
  });
@@ -273,7 +289,8 @@
 
 
  function displayStream(prevPage) {
-	mixpanel.track("Stream");
+	 mixpanel.track("PageView", {"page" : "Stream"});
+	
  	$.mobile.loading('show', {
  		text: 'Loading your friends...',
  		textVisible: true,
@@ -288,19 +305,23 @@
  		timeout: 10000
  	}).done(function(friends) {
  		$("#streamContent").empty();
- 		//TODO: check if there are no friends
- 		for (var i = 0; i < friends.length; i++) {
- 			var output = '';
- 			var myTime = moment(friends[i].checkins[0].timestamp).fromNow();
- 			output += '<ul data-role="listview" data-inset="true" id="listview-stream' + i + '"><li data-icon="false"><a href="party.html?id=' + friends[i].checkins[0].event._id + '" data-transition="none">';
- 			output += '<img src="' + friends[i].picture_url + '" class="ui-li-thumb profile-stream"/>';
- 			output += '<p class="text-stream">' + friends[i].name.firstname + '</p>'
- 			output += '<p class="text-stream">' + friends[i].checkins[0].event.name + '</p>';
- 			output += '<p class="day-stream">' + myTime + '</p>';
- 			output += '<img src="' + friends[i].checkins[0].event.poster_url + '" class="poster-stream"/>';
- 			output += '</a></li></ul>';
+ 		if(friends.length==0){
+ 			var output = '<p class="italic">It seems that none of your friends has been partying recently! Spread the voice! </p>';
  			$('#streamContent').append(output);
- 			$('#listview-stream' + i).listview();
+ 		} else {
+	 		for (var i = 0; i < friends.length; i++) {
+	 			var output = '';
+	 			var myTime = moment(friends[i].checkins[0].timestamp).fromNow();
+	 			output += '<ul data-role="listview" data-inset="true" id="listview-stream' + i + '"><li data-icon="false"><a href="party.html?id=' + friends[i].checkins[0].event._id + '" data-transition="none">';
+	 			output += '<img src="' + friends[i].picture_url + '" class="ui-li-thumb profile-stream"/>';
+	 			output += '<p class="text-stream">' + friends[i].name.firstname + '</p>'
+	 			output += '<p class="text-stream">' + friends[i].checkins[0].event.name + '</p>';
+	 			output += '<p class="day-stream">' + myTime + '</p>';
+	 			output += '<img src="' + friends[i].checkins[0].event.poster_url + '" class="poster-stream"/>';
+	 			output += '</a></li></ul>';
+	 			$('#streamContent').append(output);
+	 			$('#listview-stream' + i).listview();
+	 		}
  		}
  		$.mobile.loading('hide');
 
@@ -542,7 +563,8 @@
  }
 
  function displayAllPatches(patches) {
-	mixpanel.track("All patches list");
+	 
+	mixpanel.track("PageView", {"page" : "All patches list"});
  	$('#patchgrid').empty();
  	var blocks = ['a', 'b', 'c', 'd'];
 
@@ -599,7 +621,7 @@
  }
 
  function displayCheckin(data) {
-	mixpanel.track("Single poster");
+	 mixpanel.track("PageView", {"page" : "Poster"});
  	$('#checkinH1').html(data.name);
  	var poster_big = buildBigImg(data.poster_url);
  	$('#checkinContent').html("<img src='" + poster_big + "' />");
@@ -608,7 +630,7 @@
  }
 
  $('#profile').live('pageshow', function() {
-	mixpanel.track("Profile");
+	mixpanel.track("PageView", {"page" : "Profile"}); 
  	$('#profile-content').hide();
  	$.mobile.loading('show',{
  		text: 'Loading your profile...',
@@ -642,14 +664,8 @@
  		cache: false,
  		timeout: 10000
  	}).done(function(data) {
- 		var picture_url;
- 		console.log(data.picture_url);
- 		if ( data.picture_url == undefined ||  data.picture_url  == null ) 
- 			picture_url = "images/facebookquestionmark.jpg"; 
- 		else
- 			picture_url = data.picture_url;
- 		console.log(picture_url);
- 		$("#profilePicture").html("<img id='profilePictureImg' src='" + picture_url + "'/>");
+
+ 		$("#profilePicture").html("<img id='profilePictureImg' src='" + data.picture_url + "'/>");
  		$("#firstname").html(data.name.firstname);
  		$("#surname").html(data.name.surname);
  		$("#patch_counter").html(data.patches.length);
@@ -676,11 +692,6 @@
 
 
  function populateUserFriends() {
- 	FB.init({
- 		appId: "366089376758944",
- 		nativeInterface: CDV.FB,
- 		useCachedDialogs: false,
- 	});
 	console.log('populateUserFriends');
  	FB.getLoginStatus(function(response) {
  		if (response.status == 'connected') {
@@ -722,7 +733,8 @@
  }
 
  $('#party').live('pageshow', function(event) {
-	mixpanel.track("Event info");
+	mixpanel.track("PageView", {"page" : "Event info"}); 
+	
  	$.mobile.loading('show', {
  		text: 'Loading party info...',
  		textVisible: true,
@@ -752,6 +764,7 @@
  });
 
  function displayParty(data) {
+	mixpanel.track("Displat party", {"venue" : data.venue.name, "event" : data._id, "featured": data.venue.featured, "date" : data.time.start}); 
  	$('#party-header h1').html(data.name);
  	$('#posterImg').attr('src', data.poster_url);
  	$('#party-venue').html(data.venue.name);
@@ -806,7 +819,7 @@
 
 
  	$('#btnCheckin').one('tap', function(event) {
- 		mixpanel.track("Checkin");
+ 		
  		$.mobile.loading('show', {
  			text: 'Checking you in...',
  			textVisible: true,
@@ -815,9 +828,10 @@
  		});
  		clicked = true;
  		var eventid = getUrlVars()['id'];
- 		console.log('button checkin tapped');
- 		if ($('input[name=checkbox-0]').is(':checked')) {
- 			console.log('fb status');
+ 		var facebookShare = $('input[name=checkbox-0]').is(':checked');
+ 		mixpanel.track("Checkin", {"event" : eventid, "facebook" : facebookShare});
+ 		if (facebookShare) {
+ 				
  			var party = $('#party-header h1').text();
  			var image = $('#posterImg').attr('src');
  			var place = $('#party-venue').text();
@@ -900,7 +914,7 @@
  				$('#party-error').html('You have already checked in here.');
  				$('#party-error').show();
  				$.mobile.loading('hide');
- 				mixpanel.track("Already here");
+ 				mixpanel.track("Checkin error", {"error": "Already here"});
  				return;
  			}
  		}
@@ -920,7 +934,7 @@
  				$('#party-error').html('You have already checked in somewhere else recentely. Try again  ' + result);
  				$('#party-error').show();
  				$.mobile.loading('hide');
- 				mixpanel.track("Already elsewhere");
+ 				mixpanel.track("Checkin error", {"error": "Already elsewhere"});
  				return;
  			}
  		}
@@ -936,7 +950,7 @@
  			$('#party-error').html('This is not happening now.');
  			$('#party-error').show();
  			$.mobile.loading('hide');
- 			mixpanel.track("Not now");
+ 			mixpanel.track("Checkin error", {"error": "Not now"});
  			return;
  		}
 
@@ -967,11 +981,11 @@
  	var myLon = pos.coords.longitude;
  	var distance = haversine(myLon, myLat, venueObj.lon, venueObj.lat);
  	if (distance <= maxDistance) {
- 		mixpanel.track("Checkin enabled");
+ 		mixpanel.track("Checkin available");
  		$('#btnCheckin').removeClass('ui-disabled');
  		$("input[type='checkbox']").checkboxradio('enable');
  	} else {
- 		mixpanel.track("Too far");
+ 		mixpanel.track("Checkin error", {"error": "Too far"});
  		$('#party-error').html('You seem to be too far from it. Get closer and try again.');
  		$('#party-error').show();
  	}
@@ -994,7 +1008,7 @@
  }
 
  function onGPSError(err) {
-	 mixpanel.track("GPS error");
+	mixpanel.track("Checkin error", {"error": "GPS error"});
  	$.mobile.changePage('gpsError.html', {
  		transition: 'pop',
  		role: 'dialog'
@@ -1132,8 +1146,22 @@
  function buildBigImg(src) {
  	return src.substring(0, src.lastIndexOf(".")) + "_b" + src.substring(src.lastIndexOf("."));
  }
+ 
+ 
+ function getAge(fbDateString) {
+	    dateString = fbDateString.substr(6,4)+"-"+fbDateString.substr(0,2)+"-"+fbDateString.substr(3,2);
+	    var today = new Date();
+	    var birthDate = new Date(dateString);
+	    var age = today.getFullYear() - birthDate.getFullYear();
+	    var m = today.getMonth() - birthDate.getMonth();
+	    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+	        age--;
+	    }
+	    return age;
+	}
 
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
+	console.log("inside registeruser");
  	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
  		if (data.length == 0) {
  			
@@ -1153,9 +1181,9 @@
  			 	  timeout: 10000
  			
  				}).done(function( data ) {
- 					mixpanel.track("New user");
+ 					mixpanel.track("Registered");
  				 	window.localStorage.setItem("pm_facebook_id", facebook_id);
- 					$(location).attr('href', 'index.html');
+ 				 	$.mobile.changePage("index.html");
  				}).fail(function(jXHR, textStatus) {
  			 		if (textStatus === "timeout") {
  			 			console.log("Timeout exceeded!");
@@ -1168,7 +1196,7 @@
  		} else {
  			
 		 	window.localStorage.setItem("pm_facebook_id", facebook_id);
-			$(location).attr('href', 'index.html');
+			$.mobile.changePage("index.html");
  		}
  	});
  }
