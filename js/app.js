@@ -126,11 +126,7 @@
 
  $('#stream').live('pageshow', displayStream);
 
-
-
- document.addEventListener('deviceready', init, false);
- 
- $('#index').live('pageshow', loadIndex);
+ $('#index').live('pageshow', init);
  
 function loadIndex(){
 	console.log('inside loadIndex');
@@ -141,16 +137,9 @@ function loadIndex(){
 	 		textVisible: true,
 	 		theme: 'a',
 	 	});
-	 	var timeoutHandler = setTimeout(function() {
-				requestFailed();
-		}, 1000);
-	
-		function requestFailed() {
-			console.log('hey, FB API does not work!');
-		}
-	
-		FB.getLoginStatus(function(response) {
-				clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
+	 	
+	 	FB.getLoginStatus(function(response) {
+	 			console.log("response");
 				if (response.status === 'connected') {
 					console.log('connesso');
 					var facebook_id = window.localStorage.getItem('pm_facebook_id');
@@ -230,18 +219,20 @@ function loadIndex(){
  
  
  function init() {
-	 
-	console.log("init");
- 	$.mobile.pushStateEnabled = false;
-	FB.init({
- 			appId: "366089376758944",
- 			nativeInterface: CDV.FB,
- 			useCachedDialogs: false,
-
- 	});
-	initiated = true;
-	loadIndex();
- 	
+	if(!initiated){ 
+		console.log("init");
+	 	$.mobile.pushStateEnabled = false;
+		FB.init({
+	 			appId: "366089376758944",
+	 			channelUrl : 'channel.html', 
+	 		    status     : true, // check login status
+	 		    cookie     : true, // enable cookies to allow the server to access the session
+	 		    xfbml      : true  // parse XFBML
+	
+	 	});
+		initiated = true;
+		loadIndex();
+	}
  }
 
 
