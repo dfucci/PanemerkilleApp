@@ -764,7 +764,7 @@ function loadIndex(){
  });
 
  function displayParty(data) {
-	mixpanel.track("Displat party", {"venue" : data.venue.name, "event" : data._id, "featured": data.venue.featured, "date" : data.time.start}); 
+	mixpanel.track("Display party", {"venue" : data.venue.name, "event" : data._id, "featured": data.venue.featured, "date" : data.time.start}); 
  	$('#party-header h1').html(data.name);
  	$('#posterImg').attr('src', data.poster_url);
  	$('#party-venue').html(data.venue.name);
