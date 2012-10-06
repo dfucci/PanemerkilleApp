@@ -390,6 +390,7 @@ function loadIndex(){
  	if (unseen.length == 0) {
  		$("#divider-unlocked").after('<li class="list-patch"><p class="italic">Sorry, this time you did not unlock any patch :-( Keep on coming and checking in!</p></li>');
  		$('#liview-checkin').listview('refresh');
+ 		$.mobile.loading('hide');
  	} else {
  		var count = 0;
 
