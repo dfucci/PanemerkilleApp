@@ -177,7 +177,8 @@ function loadIndex(){
 								mixpanel.register({
 									"age": age,
 								    "gender": data[0].gender,
-								    "name": data[0].name.firstname + " " + data[0].name.surname
+								    "name": data[0].name.firstname + " " + data[0].name.surname,
+								    "code version": codeVersion
 								});
 								mixpanel.people.identify(user.id);
 								mixpanel.people.set({
