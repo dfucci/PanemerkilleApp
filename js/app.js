@@ -2,8 +2,124 @@
  var eventObj = {};
  var venueObj = {};
  var initiated = false;
+ var configurated = false
+ 
+ $(document).live('pagebeforecreate', init);
+ $(document).live('pagebeforecreate', loadIndex);
+
+
+ 
+function loadIndex(){
+	console.log('inside loadIndex');
+	if (initiated && !configurated){
+		configurated = true;
+		console.log('is initiated');
+	 	$.mobile.loading('show', {
+	 		text: 'Loading...',
+	 		textVisible: true,
+	 		theme: 'a',
+	 	});
+	 	
+	 	FB.getLoginStatus(function(response) {
+	 			console.log("response");
+				if (response.status === 'connected') {
+					console.log('connesso');
+					var facebook_id = window.localStorage.getItem('pm_facebook_id');
+					console.log(facebook_id);
+					if (!isUserInStorage()) {
+						console.log('user not in storage');
+	
+						$.ajax({
+							url: endpoint + "/users/",
+							type: "GET",
+							dataType: "json",
+							cache: false,
+							timeout: 10000,
+							data: {
+								facebook_id: facebook_id
+							}
+						}).done(function(data) {
+							if (data.length>0) {
+								user.id = data[0]._id;
+								var age = getAge(data[0].birthdate);
+								mixpanel.identify(user.id);
+								mixpanel.name_tag(user.id);
+								
+								mixpanel.register({
+									"age": age,
+								    "gender": data[0].gender,
+								    "name": data[0].name.firstname + " " + data[0].name.surname,
+								    "code version": codeVersion
+								});
+								mixpanel.people.identify(user.id);
+								mixpanel.people.set({
+								    "$email": data[0].email,    
+								    "$created": data[0].registered,
+								    "$last_login": new Date(),        
+								    "gender": data[0].gender,
+								    "age": age,
+								    "$first_name": data[0].name.firstname,
+								    "$last_name": data[0].name.surname
+								});
+							 	mixpanel.track("App launch");
+	
+								saveUserStorage(user.id);
+								
+								$.mobile.changePage('parties.html');
+							} else {
+								FB.logout(function(response) {
+							 		$.mobile.changePage('connect.html');
+							 		 var initiated = false;
+							 		 var configurated = false
+							 	});
+								
+							}
+							
+						}).fail(function(jXHR, textStatus) {
+							if (textStatus === "timeout") {
+								$.mobile.changePage('timeoutError.html', {
+									transition: 'pop',
+									role: 'dialog'
+								});
+							}
+							
+						});
+					} else {
+						user.id = window.localStorage.getItem("pm_user_id");
+						mixpanel.track("App launch");
+						mixpanel.register({"last_login": new Date()});
+						mixpanel.name_tag(user.id);
+						mixpanel.people.set({"$last_login": new Date()});
+						console.log('user in storage' + user.id);
+						$.mobile.changePage('parties.html');
+					}
+				} else {
+					console.log('non connesso');
+					$.mobile.changePage('connect.html');
+				}
+			}, true);
+	 	
+	}
+}
  
  
+ function init() {
+	if(!initiated){ 
+		initiated = true;
+		console.log("init");
+	 	$.mobile.pushStateEnabled = false;
+		FB.init({
+	 			appId: "366089376758944",
+	 			channelUrl : 'channel.html', 
+	 		    status     : true, // check login status
+	 		    cookie     : true, // enable cookies to allow the server to access the session
+	 		    xfbml      : true  // parse XFBML
+	
+	 	});
+		loadIndex();
+	}
+ }
+
 
  $('#FBLogout').live('tap', function() {
 	mixpanel.track("Logout");
@@ -126,116 +242,6 @@
 
  $('#stream').live('pageshow', displayStream);
  
- $('#index').live('pageshow', loadIndex);
- $('#index').live('pageshow', init);
-
- 
-function loadIndex(){
-	console.log('inside loadIndex');
-	if (initiated){
-		console.log('is initiated');
-	 	$.mobile.loading('show', {
-	 		text: 'Loading...',
-	 		textVisible: true,
-	 		theme: 'a',
-	 	});
-	 	
-	 	FB.getLoginStatus(function(response) {
-	 			console.log("response");
-				if (response.status === 'connected') {
-					console.log('connesso');
-					var facebook_id = window.localStorage.getItem('pm_facebook_id');
-					console.log(facebook_id);
-					if (!isUserInStorage()) {
-						console.log('user not in storage');
-	
-						$.ajax({
-							url: endpoint + "/users/",
-							type: "GET",
-							dataType: "json",
-							cache: false,
-							timeout: 10000,
-							data: {
-								facebook_id: facebook_id
-							}
-						}).done(function(data) {
-							if (data.length>0) {
-								user.id = data[0]._id;
-								var age = getAge(data[0].birthdate);
-								mixpanel.identify(user.id);
-								mixpanel.name_tag(user.id);
-								
-								mixpanel.register({
-									"age": age,
-								    "gender": data[0].gender,
-								    "name": data[0].name.firstname + " " + data[0].name.surname,
-								    "code version": codeVersion
-								});
-								mixpanel.people.identify(user.id);
-								mixpanel.people.set({
-								    "$email": data[0].email,    
-								    "$created": data[0].registered,
-								    "$last_login": new Date(),        
-								    "gender": data[0].gender,
-								    "age": age,
-								    "$first_name": data[0].name.firstname,
-								    "$last_name": data[0].name.surname
-								});
-							 	mixpanel.track("App launch");
-	
-								saveUserStorage(user.id);
-								
-								$.mobile.changePage('parties.html');
-							} else {
-								FB.logout(function(response) {
-							 		$.mobile.changePage('connect.html');
-							 	});
-								
-							}
-							
-						}).fail(function(jXHR, textStatus) {
-							if (textStatus === "timeout") {
-								$.mobile.changePage('timeoutError.html', {
-									transition: 'pop',
-									role: 'dialog'
-								});
-							}
-							
-						});
-					} else {
-						user.id = window.localStorage.getItem("pm_user_id");
-						mixpanel.track("App launch");
-						mixpanel.register({"last_login": new Date()});
-						mixpanel.name_tag(user.id);
-						mixpanel.people.set({"$last_login": new Date()});
-						console.log('user in storage' + user.id);
-						$.mobile.changePage('parties.html');
-					}
-				} else {
-					console.log('non connesso');
-					$.mobile.changePage('connect.html');
-				}
-			}, true);
-	}
-}
- 
- 
- function init() {
-	if(!initiated){ 
-		console.log("init");
-	 	$.mobile.pushStateEnabled = false;
-		FB.init({
-	 			appId: "366089376758944",
-	 			channelUrl : 'channel.html', 
-	 		    status     : true, // check login status
-	 		    cookie     : true, // enable cookies to allow the server to access the session
-	 		    xfbml      : true  // parse XFBML
-	
-	 	});
-		initiated = true;
-		loadIndex();
-	}
- }
 
 
 
@@ -1178,6 +1184,8 @@ function loadIndex(){
  				}).done(function( data ) {
  					mixpanel.track("Registered");
  				 	window.localStorage.setItem("pm_facebook_id", facebook_id);
+ 				 	 initiated = false;
+ 				 	 configurated = false;
  				 	$.mobile.changePage("index.html");
  				}).fail(function(jXHR, textStatus) {
  			 		if (textStatus === "timeout") {
@@ -1189,7 +1197,8 @@ function loadIndex(){
  			 		}
  			 	});
  		} else {
- 			
+ 		 	initiated = false;
+ 		 	configurated = false;
 		 	window.localStorage.setItem("pm_facebook_id", facebook_id);
 			$.mobile.changePage("index.html");
  		}
