@@ -137,6 +137,9 @@ function loadIndex(){
  });
 
  $('#btn-claimed').live('tap', function() {
+	 if (user.id == undefined){
+		 return;
+	 }
 	mixpanel.track("Patch claimed", {"patch" : patch});
  	var patch = getUrlVars()["id"];
  	$.ajax({
@@ -187,6 +190,9 @@ function loadIndex(){
 
  
  $('#yourpatches').live('pageshow', function(event) {
+	 if (user.id == undefined){
+		 return;
+	 }
 	mixpanel.track("PageView", {"page" : "My patches list"});
  	$.mobile.loading('show', {
  		text: 'Loading your patches...',
@@ -289,6 +295,9 @@ function loadIndex(){
 
 
  function displayStream(prevPage) {
+	 if (user.id == undefined){
+		 return;
+	 }
 	 mixpanel.track("PageView", {"page" : "Stream"});
 	
  	$.mobile.loading('show', {
@@ -337,6 +346,9 @@ function loadIndex(){
  }
 
  function displayCheckinStats(event) {
+	 if (user.id == undefined){
+		 return;
+	 }
 	
  	$.mobile.loading('show', {
  		text: 'Loading your stats...',
@@ -366,7 +378,6 @@ function loadIndex(){
  		}
  	});
 
- 	//$.getJSON(endpoint + '/users/' + user.id, updateCheckinsVenue);
  }
 
  function updateCheckinsVenue(data) {
@@ -564,6 +575,9 @@ function loadIndex(){
  }
 
  function displayAllPatches(patches) {
+	 if (user.id == undefined){
+		 return;
+	 }
 	 
 	mixpanel.track("PageView", {"page" : "All patches list"});
  	$('#patchgrid').empty();
@@ -631,6 +645,9 @@ function loadIndex(){
  }
 
  $('#profile').live('pageshow', function() {
+	 if (user.id == undefined){
+		 return;
+	 }
 	mixpanel.track("PageView", {"page" : "Profile"}); 
  	$('#profile-content').hide();
  	$.mobile.loading('show',{
@@ -693,6 +710,9 @@ function loadIndex(){
 
 
  function populateUserFriends() {
+	 if (user.id == undefined){
+		 return;
+	 }
 	console.log('populateUserFriends');
  	FB.getLoginStatus(function(response) {
  		if (response.status == 'connected') {
@@ -765,6 +785,9 @@ function loadIndex(){
  });
 
  function displayParty(data) {
+	 if (user.id == undefined){
+		 return;
+	}
 	mixpanel.track("Display party", {"venue" : data.venue.name, "event" : data._id, "featured": data.venue.featured, "date" : data.time.start}); 
  	$('#party-header h1').html(data.name);
  	$('#posterImg').attr('src', data.poster_url);
@@ -893,6 +916,9 @@ function loadIndex(){
  }
 
  function enableCheckinBtn() {
+	 if (user.id == undefined){
+		 return;
+	 }
  	$.mobile.loading('show', {
  		text: 'Looking for duplicates...',
  		textVisible: true,
