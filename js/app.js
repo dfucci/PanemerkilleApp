@@ -98,6 +98,7 @@ function loadIndex(){
 	if(!initiated){ 
 		initiated = true;
 	 	$.mobile.pushStateEnabled = false;
+	 	jQuery.support.cors = true; 
 		FB.init({
 	 			appId: "366089376758944",
 	 			channelUrl : 'channel.html', 
