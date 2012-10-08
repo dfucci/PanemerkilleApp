@@ -10,10 +10,8 @@
 
  
 function loadIndex(){
-	console.log('inside loadIndex');
 	if (initiated && !configurated){
 		configurated = true;
-		console.log('is initiated');
 	 	$.mobile.loading('show', {
 	 		text: 'Loading...',
 	 		textVisible: true,
@@ -21,14 +19,9 @@ function loadIndex(){
 	 	});
 	 	
 	 	FB.getLoginStatus(function(response) {
-	 			console.log("response");
 				if (response.status === 'connected') {
-					console.log('connesso');
 					var facebook_id = window.localStorage.getItem('pm_facebook_id');
-					console.log(facebook_id);
 					if (!isUserInStorage()) {
-						console.log('user not in storage');
-	
 						$.ajax({
 							url: endpoint + "/users/",
 							type: "GET",
@@ -90,11 +83,9 @@ function loadIndex(){
 						mixpanel.register({"last_login": new Date()});
 						mixpanel.name_tag(user.id);
 						mixpanel.people.set({"$last_login": new Date()});
-						console.log('user in storage' + user.id);
 						$.mobile.changePage('parties.html');
 					}
 				} else {
-					console.log('non connesso');
 					$.mobile.changePage('connect.html');
 				}
 			}, true);
@@ -106,7 +97,6 @@ function loadIndex(){
  function init() {
 	if(!initiated){ 
 		initiated = true;
-		console.log("init");
 	 	$.mobile.pushStateEnabled = false;
 		FB.init({
 	 			appId: "366089376758944",
@@ -150,9 +140,7 @@ function loadIndex(){
 	 	  timeout: 10000
 	
 		}).done(function( data ) {
-	 		console.log("Patch claimed");
 		}).fail(function(jXHR, textStatus) {
-			console.log("Error claiming a patch");
 	 	});
  	
 
@@ -252,7 +240,6 @@ function loadIndex(){
 
 
  $("#connect").live('pageinit', function() {
-	console.log("connect");
  	$.mobile.loading('show', {
  		text: 'Loading...',
  		textVisible: true,
@@ -260,7 +247,6 @@ function loadIndex(){
 
  	});
  	FB.Event.subscribe('auth.login', function(response) {
- 		console.log("login");
  		if (response.authResponse) {
  			FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
  		 		var picture_url;
@@ -272,7 +258,6 @@ function loadIndex(){
  				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, picture_url, response.email);			
  			});
  		} else {
- 			console.log('User cancelled login or did not fully authorize.');
  		}
  	});
  	
@@ -336,7 +321,6 @@ function loadIndex(){
 
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -370,7 +354,6 @@ function loadIndex(){
  		updateCheckinsVenue(data)
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -390,7 +373,6 @@ function loadIndex(){
  	else $("#number-checkins-venue").html(total + ' times');
  	var unseen = new Array();
  	for (var i = 0; i < data.patches.length; i++) {
- 		console.log(data.patches[i]);
  		if (!data.patches[i].seen) {
  			unseen.push(data.patches[i]);
  		}
@@ -429,7 +411,6 @@ function loadIndex(){
  				$.mobile.loading('hide');
  			}).fail(function(jXHR, textStatus) {
  				if (textStatus === "timeout") {
- 					console.log("Timeout exceeded!");
  					$.mobile.changePage('timeoutError.html', {
  						transition: 'pop',
  						role: 'dialog'
@@ -556,7 +537,6 @@ function loadIndex(){
  function displayPatches(data) {
  	var patches = data.patches;
  	if (patches.length > 0) {
- 		console.log(patches);
  		var blocks = ['a', 'b', 'c', 'd'];
  		$('#patchgrid').empty();
  		$.each(
@@ -599,7 +579,6 @@ function loadIndex(){
  			};
  			userPatches.push(patch);
  		}
- 		console.log(userPatches.length);
 
  		var patches_ids = $.map(userPatches, function(o) {
  			return o["id"];
@@ -625,7 +604,6 @@ function loadIndex(){
  		$.mobile.loading('hide');
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -699,7 +677,6 @@ function loadIndex(){
 
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -713,18 +690,14 @@ function loadIndex(){
 	 if (user.id == undefined){
 		 return;
 	 }
-	console.log('populateUserFriends');
  	FB.getLoginStatus(function(response) {
  		if (response.status == 'connected') {
- 			console.log("Retrieving user friends");
  			var pmFriends = new Array();
  			FB.api('/me/friends', {
  				fields: 'installed'
  			}, function(res) {
- 	 			console.log("Answer received");
- 				if (res.error) console.log(res.error.message);
+ 				if (res.error) {}
  				else {
- 		 			console.log("I have got the user friends");
  					for (var i = 0; i < res.data.length; i++) {
  						if (typeof res.data[i].installed != "undefined") {
  							pmFriends.push(res.data[i]);
@@ -739,9 +712,7 @@ function loadIndex(){
  					 	  timeout: 10000
  					
  						}).done(function( data ) {
- 							console.log(data);
  						}).fail(function(){
- 							console.log("Error posting user friends");
  						});
  					
  					
@@ -749,7 +720,7 @@ function loadIndex(){
  				}
  			});
 
- 		} else console.log(response.status);
+ 		} else {};
  	}, true);
  }
 
@@ -774,7 +745,6 @@ function loadIndex(){
  		displayParty(data);
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -799,7 +769,6 @@ function loadIndex(){
  	var sEnd = '';
  	var now = moment().toDate();
  	if (end < now) { // TODO: usa switch o qualcosa
- 		console.log('party over');
  		sEnd = moment(end).fromNow();
  	} else {
  		if (isGoingOn(start, end)) {
@@ -868,8 +837,8 @@ function loadIndex(){
  				caption: "at " + place,
  				description: description
  			}, function(response) {
- 				if (!response || response.error) console.log('Error while posting on Facebook');
- 				else console.log('Post successfull');
+ 				if (!response || response.error) {};
+ 				
  			});
  		}
  		$.ajax({
@@ -883,7 +852,6 @@ function loadIndex(){
 				$.mobile.changePage('checkin.html?event=' + eventid);
 			}).fail(function(jXHR, textStatus) {
 		 		if (textStatus === "timeout") {
-		 			console.log("Timeout exceeded!");
 		 			$.mobile.changePage('timeoutError.html', {
 		 				transition: 'pop',
 		 				role: 'dialog'
@@ -935,8 +903,6 @@ function loadIndex(){
  	}).done(function(data) {
 
  		for (var i = 0; i < data.checkins.length; i++) {
- 			console.log(data.checkins[i].event._id);
- 			console.log('done for');
  			if (data.checkins[i].event._id == eventID) { //check if the user checked in at the same event
  				$('#party-error').html('You have already checked in here.');
  				$('#party-error').show();
@@ -994,7 +960,6 @@ function loadIndex(){
  		});
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -1065,7 +1030,6 @@ function loadIndex(){
  		displayAllPatches(data)
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -1119,7 +1083,6 @@ function loadIndex(){
 
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -1146,7 +1109,6 @@ function loadIndex(){
  		displayCheckin(data)
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -1188,7 +1150,6 @@ function loadIndex(){
 	}
 
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
-	console.log("inside registeruser");
  	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
  		if (data.length == 0) {
  			
@@ -1215,7 +1176,6 @@ function loadIndex(){
  				 	$.mobile.changePage("index.html");
  				}).fail(function(jXHR, textStatus) {
  			 		if (textStatus === "timeout") {
- 			 			console.log("Timeout exceeded!");
  			 			$.mobile.changePage('timeoutError.html', {
  			 				transition: 'pop',
  			 				role: 'dialog'
