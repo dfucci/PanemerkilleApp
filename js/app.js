@@ -1105,12 +1105,12 @@ function loadIndex(){
 
  $('#checkin').live('pageshow', function(event) {
  	$.mobile.loading('show', {
- 		text: 'Loading poster...',
+ 		text: 'Loading checkin info...',
  		textVisible: true,
  		theme: 'a',
 
  	});
- 	var id = getUrlVars()["id"];
+ 	var id = getUrlVars()["event"];
  	$.ajax({
  		url: endpoint + "/events/" + id,
  		type: "GET",
