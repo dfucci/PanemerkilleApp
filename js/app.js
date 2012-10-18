@@ -818,7 +818,7 @@ function loadIndex(){
  		$('#party-ticket').html("No info");
  	
  	
- 	if((data.price!=undefined)&&(data.price!=null))
+ 	if((data.description!=undefined)&&(data.description!=null))
  		$('#party-desc').html(data.description);
  	else
  		$('#party-desc').html("No info");
