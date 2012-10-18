@@ -31,12 +31,11 @@ a:active {
 	background-image: url("../images/Default@2x.png");
 	background-repeat:no-repeat;
 	background-size:100% 100%;
-	height:100%;
+	height:110%;
 }
 #connectContent{
 	background-color: transparent;
 	padding-top:300px;
-	background-image:none;
 
 }
 
@@ -182,9 +181,12 @@ a:active {
 	background-color: transparent;
 	background-size: 36px 36px;
 }
+
+#stream-foot, #profile-foot, #patches-foot, #parties-foot {
+	display:none;
+}
 .ui-navbar .ui-btn-icon-top .ui-btn-inner {
-/*padding-top: 5px;*/
-height:15px;
+  height:15px;
 }
 
 .ui-icon-footbar-panemerkille-friends {
@@ -278,3 +280,5 @@ top: 4px !important;
 .warningIcon {
 	text-align: center;
 }
+
+

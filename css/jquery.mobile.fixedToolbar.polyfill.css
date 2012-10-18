@@ -1,0 +1,18 @@
+
+<!-- saved from url=(0126)https://raw.github.com/filamentgroup/jQuery-Mobile-FixedToolbar-Legacy-Polyfill/master/jquery.mobile.fixedToolbar.polyfill.css -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">/*!
+ jQuery Mobile fixedtoolbar polyfill for blacklisted browsers that don't natively support position:fixed
+ Author @scottjehl
+ Copyright 2012 Filament Group, Inc.
+ License Dual MIT or GPLv2
+*/
+.ui-fixed-faux.ui-header-fixed,
+.ui-fixed-faux.ui-footer-fixed {
+	position: absolute;
+}
+.ui-header-fixed.ui-fixed-hidden.ui-fixed-faux {
+	top: 0 !important;
+}
+.ui-footer-fixed.ui-fixed-hidden.ui-fixed-faux {
+	bottom: 0 !important;
+}</pre></body></html>

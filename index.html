@@ -3,39 +3,125 @@
 <head>
   <title>PaneMerkille - Spot the coolest parties in town. Get Free patches.</title>
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/jquery.mobile.css" />
+  <link rel="stylesheet" href="css/jquery.mobile.fixedToolbar.polyfill.css" />
   <link rel="stylesheet" href="css/custom.css" />
-  <script src="js/config.js"></script>
-  <!-- start Mixpanel -->
-   <script type="text/javascript">
-  (function(c,a){window.mixpanel=a;var b,d,h,e;b=c.createElement("script");
-  b.type="text/javascript";b.async=!0;b.src='js/mixpanel.min.js';d=c.getElementsByTagName("script")[0];
-  d.parentNode.insertBefore(b,d);a._i=[];a.init=function(b,c,f){function d(a,b){
-  var c=b.split(".");2==c.length&&(a=a[c[0]],b=c[1]);a[b]=function(){a.push([b].concat(
-  Array.prototype.slice.call(arguments,0)))}}var g=a;"undefined"!==typeof f?g=a[f]=[]:
-  f="mixpanel";g.people=g.people||[];h=['disable','track','track_pageview','track_links',
-  'track_forms','register','register_once','unregister','identify','name_tag',
-  'set_config','people.identify','people.set','people.increment'];for(e=0;e<h.length;e++)d(g,h[e]);
-  a._i.push([b,c,f])};a.__SV=1.1;})(document,window.mixpanel||[]);
-  mixpanel.init(mixpanel_token);
-  </script>
-  <!-- end Mixpanel -->
-  
-  <script src="js/jquery.js"></script>
-  <script src="js/jquery.mobile.js"></script>
-  <script src="js/jquery.resizecrop.min.js"></script>
-  <script src="cordova.js"></script>
-  
-  <script src="js/app.js"></script>
-  <script src="cdv-plugin-fb-connect.js"></script>
-  <script src="facebook_js_sdk.js"></script>
-  <script src="js/moment.min.js"></script>
 
+  <script type="text/javascript" charset="utf-8" src="js/config.js"></script>
+  <script type="text/javascript">
+	  (function(c,a){window.mixpanel=a;var b,d,h,e;b=c.createElement("script");
+	  b.type="text/javascript";b.async=!0;b.src='js/mixpanel.min.js';d=c.getElementsByTagName("script")[0];
+	  d.parentNode.insertBefore(b,d);a._i=[];a.init=function(b,c,f){function d(a,b){
+	  var c=b.split(".");2==c.length&&(a=a[c[0]],b=c[1]);a[b]=function(){a.push([b].concat(
+	  Array.prototype.slice.call(arguments,0)))}}var g=a;"undefined"!==typeof f?g=a[f]=[]:
+	  f="mixpanel";g.people=g.people||[];h=['disable','track','track_pageview','track_links',
+	  'track_forms','register','register_once','unregister','identify','name_tag',
+	  'set_config','people.identify','people.set','people.increment'];for(e=0;e<h.length;e++)d(g,h[e]);
+	  a._i.push([b,c,f])};a.__SV=1.1;})(document,window.mixpanel||[]);
+	  mixpanel.init(mixpanel_token);
+  </script>
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/jquery.mobile.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/jquery.mobile.fixedToolbar.polyfill.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/jqm.page.params.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.resizecrop.min.js"></script>
+  <script type="text/javascript" charset="utf-8" src="cordova-1.5.0.js"></script>
+  <script type="text/javascript" charset="utf-8" src="ChildBrowser.js"></script>
+  <script type="text/javascript" charset="utf-8" src="FBConnect.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/moment.min.js"></script>
 
 </head>
 <body>
-<div data-role='page' data-theme='a' id="index">
-</div>
+  <!--index-->
+  <div data-role='page' data-theme='a' id="index"></div>
+  <!--connect-->
+  <div data-role="page" data-theme="a" id="connect"><div data-role="content" data-theme="a" id="connectContent"><div id="connecting"></div><a data-role="button" data-icon="fbConnect" data-theme="b" id="fbConnect">Connect with Facebook</a></div></div>
+  <!--parties-->
+  <div data-role="page" data-theme="a" id="parties-page">
+      <div data-role="header" data-nobackbtn="true" data-theme="a"  id="profile"><h1>Parties</h1></div>
+      <div data-role="content" data-theme="a"><ul data-role="listview" data-inset="false" data-filter="false" data-theme="a" id="parties-listview"></ul></div>
+      <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false" id="parties-foot"><div data-role="navbar"><ul>
+        <li><a href="#stream" data-transition="none" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+        <li><a href="#" data-transition="none" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active ui-state-persist"></a></li>
+        <li><a href="#patches" data-transition="none" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+        <li><a href="#profile"  data-transition="none" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" ></a></li>
+      </ul></div></div></div>
+  <!--party-->
+  <div data-role="page" data-theme="a" id="party">
+    <div data-role="header" data-nobackbtn="true" data-theme="a"  id="party-header"><a data-rel="back" data-icon="back">Back</a><h1></h1></div>
+    <div data-role="content" data-theme="a" id="party-content"><div class="ui-grid-a"><div class="pos-left ui-block-a" ><img id="posterImg" src="#"/></div><div class="pos-right ui-block-b"><div class="box-padding"><input type="checkbox" checked="checked" name="checkbox-0" id="checkbox-fb" data-mini="false" disabled="true" /><label for="checkbox-fb">facebook</label><div class="join-div"><a href="#" class="ui-disabled" data-transition="none" data-role="button" data-theme="b" id="btnCheckin">I am here!</a></div></div></div><div class="pos-left ui-block-a">Where</div><div class="pos-right ui-block-b"><div class="box-padding" id="party-venue"></div></div><div class="pos-left ui-block-a" >When</div><div class="pos-right ui-block-b"><div class="box-padding" id="party-time"></div></div></div><p id="party-desc"></p><div id="attenders" class="ui-grid-c"></div></div>
+    <div data-role="footer" data-position="fixed" id="party-error" class="ui-bar"></div>
+  </div>
+  <!--profile-->
+  <div data-role="page" data-theme="a" id='profile'><div data-role="header" data-nobackbtn="true" data-theme="a"  id="profileHeader"><h1>Profile</h1></div>
+    <div data-role="content" data-theme="a" id="profile-content"><div class="ui-grid-a "><div class="ui-block-a" id="profilePicture"></div><div class="ui-block-b"><div class="box-padding"><div id="firstname"></div><div id="surname"></div><a data-role="button" data-mini="true" data-theme="b" id="FBLogout" href="#">Logout</a></div></div></div><div><ul data-role="listview" data-theme="a" data-inset="true" id="listview-stats"><li data-role="list-divider" role="heading" id="stats">Stats</li><li data-theme="a" id="stats-checkin"><a href="#" data-transition="none" id="userCheckinLink"><img src="images/user-checkins.png" class="ui-li-thumb"/><h3 class="ui-li-heading">Poster Wall</h3><p class="ui-li-desc">Your parties</p><span id="checkin_counter" class="ui-li-count">0</span></a></li><li data-theme="a" id="stats-patch"><a href="#" data-transition="none" id="userPatchesLink"><img src="images/footbar-panemerkille-patches.png" class="ui-li-thumb"/><h3 class="ui-li-heading">Patches</h3><p class="ui-li-desc">Your patches</p><span id="patch_counter" class="ui-li-count">0</span></a></li></ul></div></div>
+    <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false"  id="profile-foot"><div data-role="navbar"><ul>
+          <li><a href="#stream" data-icon="footbar-panemerkille-friends" data-transition="none" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+          <li><a href="#parties-page" data-transition="none" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+          <li><a href="#patches" data-transition="none" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+          <li><a href="#" data-transition="none" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active ui-state-persist"></a></li>
+    </ul></div></div></div>
+  <!--patches-->
+  <div data-role="page" data-theme="a" id="patches"><div data-role="header" data-nobackbtn="true" data-theme="a"><h1>Patches</h1></div>
+    <div data-role="content"><div class="ui-grid-c" id="patchgrid"></div></div>
+    <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false"  id="patches-foot"><div data-role="navbar"><ul>
+      <li><a href="#stream"  data-transition="none" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+      <li><a href="#parties-page" data-transition="none" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+      <li><a href="#" data-transition="none" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active ui-state-persist"></a></li>
+      <li><a href="#profile" data-transition="none"  data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+    </ul></div></div></div>
+  <!--stream-->
+  <div data-role="page" data-theme="a" id="stream">
+    <div data-role="header" data-nobackbtn="true" data-theme="a" id="streamHeader"><h1>Friends</h1></div>
+    <div data-role="content" data-theme="a" id="streamContent"></div>
+    <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false"  id="stream-foot"><div data-role="navbar"><ul>
+          <li><a href="#" data-transition="none" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active ui-state-persist"></a></li>
+          <li><a href="#parties-page" data-transition="none" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+          <li><a href="#patches" data-transition="none" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a></li>
+          <li><a href="#profile"  data-transition="none" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" ></a></li>
+    </ul></div></div></div>
+  <!--userPatches-->
+  <div data-role="page" data-theme="a" id="yourpatches">
+    <div data-role="header" data-nobackbtn="true" data-theme="a" ><a data-rel="back" data-icon="back">Back</a><h1>Your Patches</h1></div>
+    <div data-role="content" id="yourpatches-content"><div class="ui-grid-c" id="usrpatchgrid"></div></div>
+  </div>
+  <!--userChechins-->
+  <div data-role="page" data-theme="a" id="yourcheckins">
+    <div data-role="header" data-nobackbtn="true" data-theme="a" id="checkingHeader"><a data-rel="back" data-icon="back">Back</a><h1>Poster Wall</h1></div>
+    <div data-role="content" data-theme="a" id="yourcheckins-content"><div class="ui-grid-c" id="checkingrid"></div></div>
+  </div>
+  <!--patch-->
+  <div data-role="page" data-theme="a" id="patch">
+    <div data-role="header" data-nobackbtn="true" data-theme="a" id="profile"><a id="patch-back" data-rel="back" data-icon="back">Back</a><h1 id="patchH1">Patch</h1><a id="patch-done" href="#profile" data-icon="check" class="ui-btn-right" data-theme="b">Done</a></div>
+    <div data-role="content" data-theme="a" id="patchContent"></div>
+  </div>
+  <!--checkin-->
+  <div data-role="page" data-theme="a" class='page-joined' id="checkedin-page">
+    <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed" id="profile"><h1>Check-in</h1><a href="#profile" data-icon="check" class="ui-btn-right" data-theme="b">Done</a></div>
+    <div data-role="content" data-theme="a"><ul data-role="listview" id="liview-checkin"><li>You are at <span class="checkin-event"></span> at <span class="checkin-venue"></span></li><li>You have been <span id="number-checkins-venue"></span>  at <span class="checkin-venue"></span></li><li id="divider-unlocked" data-role="list-divider">Unlocked patches</li></ul></div>
+  </div>
+  <!--userCheckin-->
+  <div data-role="page" data-theme="a" id="checkin">
+    <div data-role="header" data-nobackbtn="true" data-theme="a" data-position="fixed"><a data-rel="back" data-icon="back">Back</a><h1 id="checkinH1">Checkin</h1></div>
+    <div data-role="content" data-theme="a" id="checkinContent"></div>
+  </div>
+  <!--claimPatch-->
+  <div data-role="dialog" data-overlay-theme="a" id="claimPatch">
+    <div data-role="header" data-theme="b"><h1>Claiming</h1></div>
+    <div data-role="content" data-theme="a"><p>Have you received your (awsome) patch?</p><a data-role="button"  href="#profile" data-theme="b" id="btn-claimed">Yes, I have it!</a><a data-role="button" data-rel="back" id="cancel-confirm-patch" data-theme="b">No, I'll do it later</a></div>
+  </div>
+  <!--timeoutError-->
+  <div data-role="dialog" data-overlay-theme="a" id="timeoutError">
+    <div data-role="header" data-theme="b"><h1>Timeout Error</h1></div>
+    <div data-role="content" data-theme="a"><div class="warningIcon"><img alt="Timeout Error" src="images/warning_black.png"/></div><p>Sorry, cannot load the page. Check your Internet connection.</p><a data-role="button" data-rel="back" id="btnRetryTimeout" data-theme="b">Retry</a></div>
+  </div>
+  <!--gpsError-->
+  <div data-role="dialog" data-overlay-theme="a" id="gpsError">
+    <div data-role="header" data-theme="b"><h1>GPS Error</h1></div>
+    <div data-role="content" data-theme="a"><div class="warningIcon"><img alt="Gps Error" src="images/warning_black.png"/></div><p>We have not been able to get your current location. Please enable it in your system settings and reach an area with better coverage.</p><a data-role="button" data-rel="back" id="btnRetryGps" data-theme="b">Retry</a></div>
+  </div>
 </body>
 </html>
