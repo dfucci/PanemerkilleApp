@@ -263,7 +263,7 @@ function loadIndex(){
  		 		if ( response.picture == undefined ||  response.picture  == null ) 
  		 			picture_url = "https://s3-eu-west-1.amazonaws.com/panemerkille/unknown-user.gif"; 
  		 		else
- 		 			picture_url = response.picture;
+ 		 			picture_url = response.picture.data.url;
  				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, picture_url, response.email);			
  			});
  		} else {
@@ -454,7 +454,7 @@ function loadIndex(){
  		}
  		if (isGoingOn(sTime, sEnd)) {
  			noPartyToday = false;
- 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
+ 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none' ><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
  			$('#li-today').after(out);
  		} else if (isToday(sTime)) 	{
  			noPartyToday = false;
@@ -806,7 +806,24 @@ function loadIndex(){
  		}
  	}
  	$('#party-time').html("<span id='day'>" + day + "</span>" + sStart + sEnd);
- 	$('#party-desc').html(data.description);
+ 	
+ 	if((data.age_limit!=undefined)&&(data.age_limit!=null))
+ 		$('#party-age').html(data.age_limit);
+ 	else
+ 		$('#party-age').html("No info");
+ 	
+ 	if((data.price!=undefined)&&(data.price!=null))
+ 		$('#party-ticket').html(data.price);
+ 	else
+ 		$('#party-ticket').html("No info");
+ 	
+ 	
+ 	if((data.price!=undefined)&&(data.price!=null))
+ 		$('#party-desc').html(data.description);
+ 	else
+ 		$('#party-desc').html("No info");
+ 	
+ 	
  	venueObj.lat = data.venue.lat;
  	venueObj.lon = data.venue.lon;
  	venueObj.name = data.venue.name;

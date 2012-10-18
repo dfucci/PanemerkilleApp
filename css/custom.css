@@ -261,7 +261,7 @@ height:15px;
 	src: url('../font/LobsterTwo-Bold.otf');
 }
 
-.ui-header .ui-title, .ui-footer .ui-title, .ui-li-divider, .ui-li-heading {
+.ui-header .ui-title, .ui-footer .ui-title, .ui-li-divider {
 font-family: 'Lobster Two';
 }
 
