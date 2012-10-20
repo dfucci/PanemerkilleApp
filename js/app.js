@@ -1,6 +1,7 @@
  var user = {};
  var eventObj = {};
  var venueObj = {};
+ var patchObj = {};
  var initiated = false;
  
  
@@ -22,7 +23,7 @@
 
  $('#btn-claimed').live('tap', function() {
 	mixpanel.track("Patch claimed", {"patch" : patch});
- 	var patch = getUrlVars()["id"];
+ 	var patch = patchObj.id;
  	$.ajax({
 		  type: "POST",
 		  url: endpoint + '/users/' + user.id + "/patches/" + patch,
@@ -78,7 +79,6 @@
  		theme: 'a',
 
  	});
- 	var id = getUrlVars()["user"];
  	$.ajax({
  		url: endpoint + "/users/" + user.id,
  		type: "GET",
@@ -104,9 +104,9 @@
  		theme: 'a',
 
  	});
- 	var id = getUrlVars()["user"];
+ 	
  	$.ajax({
- 		url: endpoint + "/users/" + id,
+ 		url: endpoint + "/users/" + user.id,
  		type: "GET",
  		dataType: "json",
  		cache: false,
@@ -313,7 +313,7 @@ function loadIndex(){
 	 		for (var i = 0; i < friends.length; i++) {
 	 			var output = '';
 	 			var myTime = moment(friends[i].checkins[0].timestamp).fromNow();
-	 			output += '<ul data-role="listview" data-inset="true" id="listview-stream' + i + '"><li data-icon="false"><a href="party.html?id=' + friends[i].checkins[0].event._id + '" data-transition="none">';
+	 			output += '<ul data-role="listview" data-inset="true" id="listview-stream' + i + '"><li data-event="'+friends[i].checkins[0].event._id +'" data-icon="false"><a href="party.html" data-transition="none">';
 	 			output += '<img src="' + friends[i].picture_url + '" class="ui-li-thumb profile-stream"/>';
 	 			output += '<p class="text-stream">' + friends[i].name.firstname + '</p>'
 	 			output += '<p class="text-stream">' + friends[i].checkins[0].event.name + '</p>';
@@ -323,6 +323,12 @@ function loadIndex(){
 	 			$('#streamContent').append(output);
 	 			$('#listview-stream' + i).listview();
 	 		}
+	 		$('#streamContent').on('tap', ' > ul > li', function () {
+	 	 		var e = $(this).data("event");
+	 	 		console.log(e);
+	 	 		if (e!=undefined)
+	 	 	   		eventObj.id = e;
+	 	 	});
  		}
  		$.mobile.loading('hide');
 
@@ -345,7 +351,7 @@ function loadIndex(){
  		theme: 'a',
 
  	});
- 	var eventID = getUrlVars()['event'];
+ 	var eventID = eventObj.id;
  	$(".checkin-event").html(eventObj.name);
  	$(".checkin-venue").html(venueObj.name);
 
@@ -367,7 +373,7 @@ function loadIndex(){
  		}
  	});
 
- 	//$.getJSON(endpoint + '/users/' + user.id, updateCheckinsVenue);
+
  }
 
  function updateCheckinsVenue(data) {
@@ -404,29 +410,34 @@ function loadIndex(){
  				timeout: 10000
  			}).done(function(patch) {
  				var output = "";
- 				output += '<li class="list-patch">';
- 				output += '<a href="patch.html?id=' + patch._id + '&claimed=false">';
+ 				output += '<li data-patch="' + patch._id + '" data-claimed="false" class="list-patch">';
+ 				output += '<a  href="patch.html">';
  				output += '<img src="' + patch.image_url + '" class="ui-li-thumb">';
  				output += '<h3 class="ui-li-heading">' + patch.name + '</h3>'
  				output += '<p class="ui-li-desc">' + patch.description + '</p>';
  				output += '</a></li>';
  				$("#divider-unlocked").after(output);
  				count++;
- 				if (unseen.length == count) {
- 					$('#liview-checkin').listview('refresh');
+ 				if (count == unseen.length){
+ 			 		$('#liview-checkin').listview('refresh');
+ 					$.mobile.loading('hide');
+ 					$('#liview-checkin').on('tap', ' > li', function () {
+ 				 	 		var c = $(this).data("claimed");
+ 				 	 		var p = $(this).data("patch");
+ 				 	 		if (c!=undefined)
+ 				 	 	   		patchObj.claimed = c;
+ 				 	 		if (p!=undefined)
+ 				 	 	   		patchObj.id = p;
+ 				 	});
+ 					
+ 					
  				}
-
- 				$.mobile.loading('hide');
- 			}).fail(function(jXHR, textStatus) {
- 				if (textStatus === "timeout") {
- 					console.log("Timeout exceeded!");
- 					$.mobile.changePage('timeoutError.html', {
- 						transition: 'pop',
- 						role: 'dialog'
- 					});
- 				}
+		
+ 				
  			});
  		};
+
+ 		
  	}
 
 
@@ -440,7 +451,7 @@ function loadIndex(){
  	var noPartyToday = true;
  	var noPartyTomorrow = true;
  	var noPartyUpcoming = true;
- 	
+
  	$.each(data.reverse(), function(index, party) {
  		var out = '';
  		var sTime = moment(party.time.start).toDate();
@@ -454,15 +465,15 @@ function loadIndex(){
  		}
  		if (isGoingOn(sTime, sEnd)) {
  			noPartyToday = false;
- 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none' ><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none' ><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
  			$('#li-today').after(out);
  		} else if (isToday(sTime)) 	{
  			noPartyToday = false;
- 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-today').after(out);
  		} else if (isTomorrow(sTime)) {	
  			noPartyTomorrow = false;
- 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-tomorrow').after(out);
  			
  		} else  {
@@ -473,7 +484,7 @@ function loadIndex(){
  			if (tomorrow.getDate() == sTime.getDate()) {
  				sDay = 'Tomorrow';
  			}
- 			out += "<li><a href='party.html?id=" + party._id + "' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb'/><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sDay + " " + sHour + ":" + sMinute + " </p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb'/><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sDay + " " + sHour + ":" + sMinute + " </p></a></li>";
  			$('#li-upcoming').after(out);
  		}
  	});
@@ -487,6 +498,12 @@ function loadIndex(){
  		$('#li-upcoming').after("<li><p  class='italic no-event'>Unfortunately there are no upcoming events. </p><p class='italic no-event'>It might be the right time to take have rest :)</p></li>");
 
  	}
+ 	
+ 	$('#parties-listview').on('tap', ' > li', function () {
+ 		var e = $(this).data("event");
+ 		if (e!=undefined)
+ 	   		eventObj.id=e;
+ 	});
  	$("#parties-listview").listview('refresh');
 
  	$.mobile.loading('hide');
@@ -534,8 +551,15 @@ function loadIndex(){
  			var event_poster = c.event.poster_url;
  			var k = index % 4;
  			var cls = "ui-block-" + blocks[k];
- 			$('#checkingrid').append('<div class=' + cls + '> <a href="userCheckin.html?id=' + event_id + '" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
+ 			$('#checkingrid').append('<div class=' + cls + '> <a data-event = "'+event_id+'" href="userCheckin.html" data-ajax="false data-transition="none"><div><img class=poster src="' + event_poster + '"></div></a></div>');
  		});
+ 		$('#checkingrid').on('tap', ' > div > a', function () {
+ 	
+ 	 		var e = $(this).data("event");
+ 	 	
+ 	 		if (e!=undefined)
+ 	 	   		eventObj.id = e;
+ 	 	});
  	} else {
  		$('#yourcheckins-content').append('<p class="italic">It looks pretty empty around here. Attend some party and watch your poster wall filling up ;)</p>');
  	}
@@ -556,8 +580,17 @@ function loadIndex(){
  			var patch_id = p.patch._id;
  			var k = index % 4;
  			var cls = "ui-block-" + blocks[k];
- 			$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html?id=' + patch_id + '&claimed=' + p.claimed + '" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
+ 			$('#patchgrid').append('<div class=' + cls + '> <a href="patch.html" data-claimed="'+p.claimed+'" data-patch="'+patch_id+'" data-transition="none"><div class="patch"><img class="patchImg" src="' + patch_image + '"></div></a></div>');
  		});
+ 		
+ 		$('#patchgrid').on('tap', ' > div > a', function () {
+ 	 		var c = $(this).data("claimed");
+ 	 		var p = $(this).data("patch");
+ 	 		if (c!=undefined)
+ 	 	   		patchObj.claimed = c;
+ 	 		if (p!=undefined)
+ 	 	   		patchObj.id = p;
+ 	 	});
  	} else {
  		$('#yourpatches-content').append('<p class="italic">It looks pretty empty around here. Attend some party and collect awesome patches ;)</p>');
  	}
@@ -592,8 +625,9 @@ function loadIndex(){
  			return o["id"];
  		});
  		var count = 0;
- 		$.each(
- 		patches, function(index, p) {
+ 	
+ 		$.each(patches, function(index, p) {
+ 			var data = "";
  			var patch_name = p.name;
  			var patch_image = p.image_url;
  			var patch_id = p._id;
@@ -604,11 +638,20 @@ function loadIndex(){
  				href = "#";
  				opaque += " locked";
  			} else {
- 				var href = 'patch.html?id=' + patch_id + '&claimed=' + userPatches[count].claimed;
+ 				var href = 'patch.html';
+ 				data= 'data-claimed="'+userPatches[count].claimed+'" data-patch="'+patch_id+'"';
  				count++;
  			}
- 			$('#patchgrid').append('<div class="' + cls + '"><a href="' + href + '" data-transition="none"> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/></div></a></div>');
+ 			$('#patchgrid').append('<div class="' + cls + '"><a '+data+' href="' + href + '" data-transition="none"> <div class="patch"><img class="patchImg' + opaque + '" src="' + patch_image + '"/></div></a></div>');
  		});
+ 		$('#patchgrid').on('tap', ' > div > a', function () {
+ 	 		var c = $(this).data("claimed");
+ 	 		var p = $(this).data("patch");
+ 	 		if (c!=undefined)
+ 	 	   		patchObj.claimed = c;
+ 	 		if (p!=undefined)
+ 	 	   		patchObj.id = p;
+ 	 	});
  		$.mobile.loading('hide');
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
@@ -656,8 +699,8 @@ function loadIndex(){
  }
 
  function populateUser(userid) {
- 	$("#userPatchesLink").attr('href', 'userPatches.html?user=' + userid);
- 	$("#userCheckinLink").attr('href', 'userCheckins.html?user=' + userid);
+ 	$("#userPatchesLink").attr('href', 'userPatches.html');
+ 	$("#userCheckinLink").attr('href', 'userCheckins.html');
 
  	$.ajax({
  		url: endpoint + "/users/" + userid,
@@ -744,9 +787,9 @@ function loadIndex(){
 
  	});
  	$("#party-content").hide();
- 	var id = getUrlVars()['id'];
+ 	
  	$.ajax({
- 		url: endpoint + '/events/' + id,
+ 		url: endpoint + '/events/' + eventObj.id,
  		type: "GET",
  		dataType: "json",
  		cache: false,
@@ -846,7 +889,7 @@ function loadIndex(){
 
  		});
  		clicked = true;
- 		var eventid = getUrlVars()['id'];
+ 		var eventid = eventObj.id;
  		var facebookShare = $('input[name=checkbox-0]').is(':checked');
  		mixpanel.track("Checkin", {"event" : eventid, "facebook" : facebookShare});
  		if (facebookShare) {
@@ -875,7 +918,7 @@ function loadIndex(){
 		 	  timeout: 10000
 		
 			}).done(function( data ) {
-				$.mobile.changePage('checkin.html?event=' + eventid);
+				$.mobile.changePage('checkin.html');
 			}).fail(function(jXHR, textStatus) {
 		 		if (textStatus === "timeout") {
 		 			console.log("Timeout exceeded!");
@@ -917,7 +960,7 @@ function loadIndex(){
  		theme: 'a',
 
  	});
- 	var eventID = getUrlVars()['id'];
+ 	var eventID = eventObj.id;
  	$.ajax({
  		url: endpoint + "/users/" + user.id,
  		type: "GET",
@@ -1066,10 +1109,7 @@ function loadIndex(){
  	});
  });
 
- // $('#patch').live('pageshow', function(event) {
- // 	var id = getUrlVars()["id"];
- // 	$.getJSON(endpoint + '/patches/' + id, displayPatch)
- // });
+
  $('#patch').live('pageshow', function(event, ui) {
  	$.mobile.loading('show', {
  		text: 'Loading patch info...',
@@ -1084,17 +1124,10 @@ function loadIndex(){
  		$('#patch-back').hide();
  		$('#patch-done').show();
  	}
- 	var hashes = $(this).data("url").split("?")[1].split('&'); //TODO: check 2 parameters.
- 	var vars = [];
- 	for (var i = 0; i < hashes.length; i++) {
- 		hash = hashes[i].split('=');
- 		//vars.push(hash[0]);
- 		vars[hash[0]] = hash[1];
- 	}
- 	var patch = vars['id'];
- 	var claimed = vars['claimed'];
+ 	
+ 	
  	$.ajax({
- 		url: endpoint + '/patches/' + patch,
+ 		url: endpoint + '/patches/' + patchObj.id,
  		type: "GET",
  		dataType: "json",
  		cache: false,
@@ -1103,8 +1136,9 @@ function loadIndex(){
  		$('#patchH1').html(data.name);
  		var output = "<img id='singlepatch' src='" + data.image_url + "' /><p>" + data.description + "</p>";
  		$('#patchContent').html(output);
- 		if (claimed == 'false') {
- 			$('#patchContent').append('<p>Woah! Show this virtual patch to the staff to get a real one and then tap the button!</p><a data-role="button" data-icon="check" data-theme="b" data-rel="dialog" href="claimPatch.html?id="' + patch + ' id="btn-dialog-claimed">OK, I got my real patch!</a>');
+ 		if (!patchObj.claimed) {
+ 			console.log("here");
+ 			$('#patchContent').append('<p>Woah! Show this virtual patch to the staff to get a real one and then tap the button!</p><a data-role="button" data-icon="check" data-theme="b" data-rel="dialog" href="claimPatch.html" id="btn-dialog-claimed">OK, I got my real patch!</a>');
  			$('#btn-dialog-claimed').button();
  		}
  		$.mobile.loading('hide');
@@ -1127,9 +1161,9 @@ function loadIndex(){
  		theme: 'a',
 
  	});
- 	var id = getUrlVars()["id"];
+ 	
  	$.ajax({
- 		url: endpoint + "/events/" + id,
+ 		url: endpoint + "/events/" + eventObj.id,
  		type: "GET",
  		dataType: "json",
  		timeout: 10000,
@@ -1148,19 +1182,6 @@ function loadIndex(){
 
  });
 
-
- function getUrlVars() {
- 	var vars = [],
- 		hash;
- 	var hashes = window.location.href.slice(
- 	window.location.href.indexOf('?') + 1).split('&');
- 	for (var i = 0; i < hashes.length; i++) {
- 		hash = hashes[i].split('=');
- 		//vars.push(hash[0]);
- 		vars[hash[0]] = hash[1];
- 	}
- 	return vars;
- }
 
  function buildBigImg(src) {
  	return src.substring(0, src.lastIndexOf(".")) + "_b" + src.substring(src.lastIndexOf("."));
