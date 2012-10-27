@@ -9,6 +9,8 @@
   <script src="js/jquery.js"></script>
   <script src="js/jquery.mobile.js"></script>
   <script src="cordova.js"></script>
+    <script src="js/moment.min.js"></script>
+
   <script src="js/app.js"></script>
 
 </head>
@@ -22,6 +24,17 @@
 
     <div data-role="content" data-theme="a">
 
+       <div data-role="popup" id="popup-parties-1" class="ui-content" data-overlay-theme="a">
+          <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+          <p>Your nightlife starts here!</p>
+          <p>Have a glimpse to the parties for this week.</p>
+        </div>
+
+        <div data-role="popup" id="popup-parties-2" class="ui-content" data-overlay-theme="a">
+          <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+          <p>We feature the parties with the <img id="popup-star" src="images/corner.png"/>.</p>
+          <p>That's where you get free patches!</p>
+        </div>
         <ul data-role="listview" data-inset="false" data-filter="false" data-theme="a" id="parties-listview">
 
         </ul>

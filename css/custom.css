@@ -50,9 +50,11 @@ a:active {
 	position: absolute;
 	top:0px;
 	right:0px;
-	max-height:25px;
+	max-height:20px;
 }
-
+#popup-star {
+	max-height:20px;
+}
 
  /*Stream*/
  .ui-li .text-stream{

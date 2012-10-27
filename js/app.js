@@ -14,7 +14,8 @@
  		theme: 'a',
 
  	});
- 	window.localStorage.clear();
+ 	window.localStorage.removeItem('pm_facebook_id');
+ 	window.localStorage.removeItem('pm_user_id');
  	FB.logout(function(response) {
  		$.mobile.changePage('connect.html');
  		$.mobile.loading('hide');
@@ -133,9 +134,7 @@
  $('#index').live('pageshow', loadIndex);
  
 function loadIndex(){
-	console.log('inside loadIndex');
 	if (initiated){
-		console.log('is initiated');
 	 	$.mobile.loading('show', {
 	 		text: 'Loading...',
 	 		textVisible: true,
@@ -150,14 +149,15 @@ function loadIndex(){
 		}
 	
 		FB.getLoginStatus(function(response) {
+				var stored_codeversion = window.localStorage.getItem('pm-codeversion');
 				clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
 				if (response.status === 'connected') {
 					console.log('connesso');
 					var facebook_id = window.localStorage.getItem('pm_facebook_id');
 					console.log(facebook_id);
-					if (!isUserInStorage()) {
-						console.log('user not in storage');
-	
+					if (!isUserInStorage() || codeVersion==null || codeVersion!=stored_codeversion) {
+						console.log('trying to log out');
+						
 						$.ajax({
 							url: endpoint + "/users/",
 							type: "GET",
@@ -173,12 +173,16 @@ function loadIndex(){
 								var age = getAge(data[0].birthdate);
 								mixpanel.identify(user.id);
 								mixpanel.name_tag(user.id);
-								
+								var register_date = new Date();
 								mixpanel.register({
 									"age": age,
 								    "gender": data[0].gender,
 								    "name": data[0].name.firstname + " " + data[0].name.surname,
-								    "code version": codeVersion
+								    "first_name":data[0].name.firstname,
+								    "last_name":data[0].name.surname,
+								    "code version": codeVersion,
+								    "email" : data[0].email,
+								    "last_login": register_date
 								});
 								mixpanel.people.identify(user.id);
 								mixpanel.people.set({
@@ -193,7 +197,7 @@ function loadIndex(){
 							 	mixpanel.track("App launch");
 	
 								saveUserStorage(user.id);
-								
+								window.localStorage.setItem('pm-codeversion', codeVersion);
 								$.mobile.changePage('parties.html');
 							} else {
 								FB.logout(function(response) {
@@ -271,9 +275,19 @@ function loadIndex(){
  		}
  	});
  	
- 	$.mobile.loading('hide');
+ 	$.mobile.loading('hide')
 
  });
+$('#connect').live('pageshow', function(){
+	if(window.localStorage.getItem('connect-tour')==null)
+	{
+		$('#popup-connect').popup('open');
+		window.localStorage.setItem('connect-tour', 'true');
+	}
+});
+
+
+
 
  $("#fbConnect").live('tap', function(e) {
  	$.mobile.loading('show', {
@@ -505,8 +519,18 @@ function loadIndex(){
  	   		eventObj.id=e;
  	});
  	$("#parties-listview").listview('refresh');
-
+ 	$('#popup-parties-1').on({
+        popupafterclose: function() {
+            setTimeout( function(){ $( '#popup-parties-2' ).popup('open' ) }, 500 );
+        }
+    });
  	$.mobile.loading('hide');
+ 	if(window.localStorage.getItem('parties-tour')==null)
+		{
+		 	$('#popup-parties-1').popup();
+	 		$('#popup-parties-1').popup('open');
+			window.localStorage.setItem('parties-tour', 'true');
+		}
  }
 
 
