@@ -133,9 +133,7 @@
  $('#index').live('pageshow', loadIndex);
  
 function loadIndex(){
-	console.log('inside loadIndex');
 	if (initiated){
-		console.log('is initiated');
 	 	$.mobile.loading('show', {
 	 		text: 'Loading...',
 	 		textVisible: true,
@@ -152,11 +150,9 @@ function loadIndex(){
 		FB.getLoginStatus(function(response) {
 				clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
 				if (response.status === 'connected') {
-					console.log('connesso');
 					var facebook_id = window.localStorage.getItem('pm_facebook_id');
 					console.log(facebook_id);
 					if (!isUserInStorage()) {
-						console.log('user not in storage');
 	
 						$.ajax({
 							url: endpoint + "/users/",
@@ -221,23 +217,31 @@ function loadIndex(){
 						$.mobile.changePage('parties.html');
 					}
 				} else {
-					console.log('non connesso');
 					$.mobile.changePage('connect.html');
 				}
-			}, true);
+			});
 	}
 }
  
  
  function init() {
 	 
-	console.log("init");
  	$.mobile.pushStateEnabled = false;
 	FB.init({
  			appId: "366089376758944",
  			nativeInterface: CDV.FB,
  			useCachedDialogs: false,
-
+ 			status: true
+ 	});
+ 	FB.Event.subscribe('auth.login', function(response) {
+ 		if (response.status === 'connected') {
+ 			FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
+ 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, response.picture.data.url, response.email);			
+ 			});
+ 		} else {
+ 			console.log('User cancelled login or did not fully authorize.');
+ 			$.mobile.loading("hide");
+ 		}
  	});
 	initiated = true;
 	loadIndex();
@@ -246,34 +250,6 @@ function loadIndex(){
 
 
 
- $("#connect").live('pageinit', function() {
-	console.log("connect");
- 	$.mobile.loading('show', {
- 		text: 'Loading...',
- 		textVisible: true,
- 		theme: 'a',
-
- 	});
- 	FB.Event.subscribe('auth.login', function(response) {
- 		console.log("login");
- 		if (response.authResponse) {
- 			FB.api('/me?fields=id,first_name,last_name,birthday,gender,email,picture&type=large', function(response) {
- 		 		var picture_url;
- 		 		
- 		 		if ( response.picture == undefined ||  response.picture  == null ) 
- 		 			picture_url = "https://s3-eu-west-1.amazonaws.com/panemerkille/unknown-user.gif"; 
- 		 		else
- 		 			picture_url = response.picture.data.url;
- 				registerUser(response.id, response.first_name, response.last_name, response.birthday, response.gender, picture_url, response.email);			
- 			});
- 		} else {
- 			console.log('User cancelled login or did not fully authorize.');
- 		}
- 	});
- 	
- 	$.mobile.loading('hide');
-
- });
 
  $("#fbConnect").live('tap', function(e) {
  	$.mobile.loading('show', {
@@ -325,7 +301,6 @@ function loadIndex(){
 	 		}
 	 		$('#streamContent').on('tap', ' > ul > li', function () {
 	 	 		var e = $(this).data("event");
-	 	 		console.log(e);
 	 	 		if (e!=undefined)
 	 	 	   		eventObj.id = e;
 	 	 	});
@@ -334,7 +309,6 @@ function loadIndex(){
 
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -365,7 +339,6 @@ function loadIndex(){
  		updateCheckinsVenue(data)
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -386,7 +359,6 @@ function loadIndex(){
  	else $("#number-checkins-venue").html(total + ' times');
  	var unseen = new Array();
  	for (var i = 0; i < data.patches.length; i++) {
- 		console.log(data.patches[i]);
  		if (!data.patches[i].seen) {
  			unseen.push(data.patches[i]);
  		}
@@ -570,7 +542,6 @@ function loadIndex(){
  function displayPatches(data) {
  	var patches = data.patches;
  	if (patches.length > 0) {
- 		console.log(patches);
  		var blocks = ['a', 'b', 'c', 'd'];
  		$('#patchgrid').empty();
  		$.each(
@@ -619,8 +590,6 @@ function loadIndex(){
  			};
  			userPatches.push(patch);
  		}
- 		console.log(userPatches.length);
-
  		var patches_ids = $.map(userPatches, function(o) {
  			return o["id"];
  		});
@@ -655,7 +624,6 @@ function loadIndex(){
  		$.mobile.loading('hide');
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -726,7 +694,6 @@ function loadIndex(){
 
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -737,18 +704,12 @@ function loadIndex(){
 
 
  function populateUserFriends() {
-	console.log('populateUserFriends');
- 	FB.getLoginStatus(function(response) {
- 		if (response.status == 'connected') {
- 			console.log("Retrieving user friends");
- 			var pmFriends = new Array();
- 			FB.api('/me/friends', {
+	var pmFriends = new Array();
+ 	FB.api('/me/friends', {
  				fields: 'installed'
- 			}, function(res) {
- 	 			console.log("Answer received");
+ 	}, function(res) {
  				if (res.error) console.log(res.error.message);
  				else {
- 		 			console.log("I have got the user friends");
  					for (var i = 0; i < res.data.length; i++) {
  						if (typeof res.data[i].installed != "undefined") {
  							pmFriends.push(res.data[i]);
@@ -772,10 +733,8 @@ function loadIndex(){
 
  				}
  			});
+}
 
- 		} else console.log(response.status);
- 	}, true);
- }
 
  $('#party').live('pageshow', function(event) {
 	mixpanel.track("PageView", {"page" : "Event info"}); 
@@ -798,7 +757,6 @@ function loadIndex(){
  		displayParty(data);
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
- 			console.log("Timeout exceeded!");
  			$.mobile.changePage('timeoutError.html', {
  				transition: 'pop',
  				role: 'dialog'
@@ -820,7 +778,6 @@ function loadIndex(){
  	var sEnd = '';
  	var now = moment().toDate();
  	if (end < now) { // TODO: usa switch o qualcosa
- 		console.log('party over');
  		sEnd = moment(end).fromNow();
  	} else {
  		if (isGoingOn(start, end)) {
@@ -1202,7 +1159,15 @@ function loadIndex(){
 
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
 	console.log("inside registeruser");
- 	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
+	
+	$.ajax({
+		  type: "GET",
+		  url: endpoint + '/users',
+		  data: {facebook_id: facebook_id},
+	 	  cache: false,
+	 	  timeout: 10000,
+	 	  dataType: "json"
+		}).done(function(data) {
  		if (data.length == 0) {
  			
  	 		$.ajax({
@@ -1226,7 +1191,6 @@ function loadIndex(){
  				 	$.mobile.changePage("index.html");
  				}).fail(function(jXHR, textStatus) {
  			 		if (textStatus === "timeout") {
- 			 			console.log("Timeout exceeded!");
  			 			$.mobile.changePage('timeoutError.html', {
  			 				transition: 'pop',
  			 				role: 'dialog'
