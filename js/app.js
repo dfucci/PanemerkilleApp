@@ -275,19 +275,9 @@ function loadIndex(){
  		}
  	});
  	
- 	$.mobile.loading('hide')
+ 	$.mobile.loading('hide');
 
  });
-$('#connect').live('pageshow', function(){
-	if(window.localStorage.getItem('connect-tour')==null)
-	{
-		$('#popup-connect').popup('open');
-		window.localStorage.setItem('connect-tour', 'true');
-	}
-});
-
-
-
 
  $("#fbConnect").live('tap', function(e) {
  	$.mobile.loading('show', {
@@ -457,7 +447,7 @@ $('#connect').live('pageshow', function(){
 
  }
 
- function displayParties(data) { // TODO: refactor
+  function displayParties(data) { // TODO: refactor
  	var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
  	boilerplate += "<li data-role='list-divider' id='li-tomorrow'>Tomorrow</li>";
  	boilerplate += "<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
@@ -519,18 +509,8 @@ $('#connect').live('pageshow', function(){
  	   		eventObj.id=e;
  	});
  	$("#parties-listview").listview('refresh');
- 	$('#popup-parties-1').on({
-        popupafterclose: function() {
-            setTimeout( function(){ $( '#popup-parties-2' ).popup('open' ) }, 500 );
-        }
-    });
+
  	$.mobile.loading('hide');
- 	if(window.localStorage.getItem('parties-tour')==null)
-		{
-		 	$('#popup-parties-1').popup();
-	 		$('#popup-parties-1').popup('open');
-			window.localStorage.setItem('parties-tour', 'true');
-		}
  }
 
 
@@ -1224,11 +1204,19 @@ $('#connect').live('pageshow', function(){
 	    return age;
 	}
 
+var pippo = 0;
+var pluto = 0;
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
 	console.log("inside registeruser");
- 	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
- 		if (data.length == 0) {
- 			
+ 	$.ajax({
+ 		type: "GET",
+ 		dataType: "json",
+ 		url: endpoint + '/users/',
+ 		data: {facebook_id: facebook_id},
+ 		cache: false,
+ 		timeout: 10000
+ 	}).done(function(data) {
+ 		if (data.length == 0) {	
  	 		$.ajax({
  				  type: "POST",
  				  url: endpoint + '/users',
