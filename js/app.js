@@ -156,8 +156,6 @@ function loadIndex(){
 					var facebook_id = window.localStorage.getItem('pm_facebook_id');
 					console.log(facebook_id);
 					if (!isUserInStorage() || codeVersion==null || codeVersion!=stored_codeversion) {
-						console.log('trying to log out');
-						
 						$.ajax({
 							url: endpoint + "/users/",
 							type: "GET",
