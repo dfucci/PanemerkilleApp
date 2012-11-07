@@ -6,6 +6,7 @@
  
  
 
+
  $('#FBLogout').live('tap', function() {
 	mixpanel.track("Logout");
  	$.mobile.loading('show', {
