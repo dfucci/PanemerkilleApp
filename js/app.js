@@ -14,7 +14,8 @@
  		theme: 'a',
 
  	});
- 	window.localStorage.clear();
+ 	window.localStorage.removeItem('pm_facebook_id');
+ 	window.localStorage.removeItem('pm_user_id');
  	FB.logout(function(response) {
  		$.mobile.changePage('connect.html');
  		$.mobile.loading('hide');
@@ -133,9 +134,7 @@
  $('#index').live('pageshow', loadIndex);
  
 function loadIndex(){
-	console.log('inside loadIndex');
 	if (initiated){
-		console.log('is initiated');
 	 	$.mobile.loading('show', {
 	 		text: 'Loading...',
 	 		textVisible: true,
@@ -150,14 +149,15 @@ function loadIndex(){
 		}
 	
 		FB.getLoginStatus(function(response) {
+				var stored_codeversion = window.localStorage.getItem('pm-codeversion');
 				clearTimeout(timeoutHandler); // This will clear the timeout in case of proper FB call
 				if (response.status === 'connected') {
 					console.log('connesso');
 					var facebook_id = window.localStorage.getItem('pm_facebook_id');
 					console.log(facebook_id);
-					if (!isUserInStorage()) {
-						console.log('user not in storage');
-	
+					if (!isUserInStorage() || codeVersion==null || codeVersion!=stored_codeversion) {
+						console.log('trying to log out');
+						
 						$.ajax({
 							url: endpoint + "/users/",
 							type: "GET",
@@ -173,12 +173,16 @@ function loadIndex(){
 								var age = getAge(data[0].birthdate);
 								mixpanel.identify(user.id);
 								mixpanel.name_tag(user.id);
-								
+								var register_date = new Date();
 								mixpanel.register({
 									"age": age,
 								    "gender": data[0].gender,
 								    "name": data[0].name.firstname + " " + data[0].name.surname,
-								    "code version": codeVersion
+								    "first_name":data[0].name.firstname,
+								    "last_name":data[0].name.surname,
+								    "code version": codeVersion,
+								    "email" : data[0].email,
+								    "last_login": register_date
 								});
 								mixpanel.people.identify(user.id);
 								mixpanel.people.set({
@@ -193,7 +197,7 @@ function loadIndex(){
 							 	mixpanel.track("App launch");
 	
 								saveUserStorage(user.id);
-								
+								window.localStorage.setItem('pm-codeversion', codeVersion);
 								$.mobile.changePage('parties.html');
 							} else {
 								FB.logout(function(response) {
@@ -443,7 +447,7 @@ function loadIndex(){
 
  }
 
- function displayParties(data) { // TODO: refactor
+  function displayParties(data) { // TODO: refactor
  	var boilerplate = "<li  data-role='list-divider' id='li-today'>Today</li>";
  	boilerplate += "<li data-role='list-divider' id='li-tomorrow'>Tomorrow</li>";
  	boilerplate += "<li data-role='list-divider' id='li-upcoming'>Upcoming</li>";
@@ -1200,11 +1204,19 @@ function loadIndex(){
 	    return age;
 	}
 
+var pippo = 0;
+var pluto = 0;
  function registerUser(facebook_id, firstname, surname, birthdate, gender, picture_url, email) {
 	console.log("inside registeruser");
- 	$.get(endpoint + "/users/?facebook_id=" + facebook_id, function(data) {
- 		if (data.length == 0) {
- 			
+ 	$.ajax({
+ 		type: "GET",
+ 		dataType: "json",
+ 		url: endpoint + '/users/',
+ 		data: {facebook_id: facebook_id},
+ 		cache: false,
+ 		timeout: 10000
+ 	}).done(function(data) {
+ 		if (data.length == 0) {	
  	 		$.ajax({
  				  type: "POST",
  				  url: endpoint + '/users',
