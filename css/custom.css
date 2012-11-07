@@ -33,6 +33,12 @@ a:active {
 	background-size:100% 100%;
 	height:100%;
 }
+
+.tos {
+	margin-left: 25px;
+	margin-right: 25px;
+	text-align:center;
+}
 #connectContent{
 	background-color: transparent;
 	padding-top:300px;
