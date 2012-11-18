@@ -413,6 +413,7 @@ function loadIndex(){
  				cache: false,
  				timeout: 10000
  			}).done(function(patch) {
+ 				mixpanel.track("Unlock patch", {"name":patch.name, "user":user.id});
  				var output = "";
  				output += '<li data-patch="' + patch._id + '" data-claimed="false" class="list-patch">';
  				output += '<a  href="patch.html">';
