@@ -469,16 +469,21 @@ function loadIndex(){
  			featured += "<img class='featured' src='images/corner.png'/>";
  		}
  		if (isGoingOn(sTime, sEnd)) {
+ 			var attenders = party.attenders.length;
+ 			var bubble ='';
+ 			if (attenders>0) {
+ 				bubble = "<span class='ui-li-count'>"+attenders+"</span>";
+ 			}
  			noPartyToday = false;
- 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none' ><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none' ><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3>"+ bubble +"<p>" + party.venue.name + " - Now</p></a></li>";
  			$('#li-today').after(out);
  		} else if (isToday(sTime)) 	{
  			noPartyToday = false;
- 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			out += "<li  data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-today').after(out);
  		} else if (isTomorrow(sTime)) {	
  			noPartyTomorrow = false;
- 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			out += "<li  data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-tomorrow').after(out);
  			
  		} else  {
