@@ -6,6 +6,7 @@
  
  
 
+
  $('#FBLogout').live('tap', function() {
 	mixpanel.track("Logout");
  	$.mobile.loading('show', {
@@ -156,8 +157,6 @@ function loadIndex(){
 					var facebook_id = window.localStorage.getItem('pm_facebook_id');
 					console.log(facebook_id);
 					if (!isUserInStorage() || codeVersion==null || codeVersion!=stored_codeversion) {
-						console.log('trying to log out');
-						
 						$.ajax({
 							url: endpoint + "/users/",
 							type: "GET",
@@ -403,7 +402,6 @@ function loadIndex(){
  		$.mobile.loading('hide');
  	} else {
  		var count = 0;
-
  		for (var i = 0; i < unseen.length; i++) {
  			var id = unseen[i].patch._id;
  			$.ajax({
@@ -413,7 +411,7 @@ function loadIndex(){
  				cache: false,
  				timeout: 10000
  			}).done(function(patch) {
- 				mixpanel.track("Unlock patch", {"name":patch.name, "user":user.id});
+ 				mixpanel.track('Patch unlocked', {'patch':patch.name, 'user': user.id});
  				var output = "";
  				output += '<li data-patch="' + patch._id + '" data-claimed="false" class="list-patch">';
  				output += '<a  href="patch.html">';
@@ -469,21 +467,16 @@ function loadIndex(){
  			featured += "<img class='featured' src='images/corner.png'/>";
  		}
  		if (isGoingOn(sTime, sEnd)) {
- 			var attenders = party.attenders.length;
- 			var bubble ='';
- 			if (attenders>0) {
- 				bubble = "<span class='ui-li-count'>"+attenders+"</span>";
- 			}
  			noPartyToday = false;
- 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none' ><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3>"+ bubble +"<p>" + party.venue.name + " - Now</p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none' ><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - Now</p></a></li>";
  			$('#li-today').after(out);
  		} else if (isToday(sTime)) 	{
  			noPartyToday = false;
- 			out += "<li  data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-today').after(out);
  		} else if (isTomorrow(sTime)) {	
  			noPartyTomorrow = false;
- 			out += "<li  data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
+ 			out += "<li data-event="+party._id+"><a href='party.html' data-transition='none'><img src='" + party.poster_url + "' class='ui-li-thumb' /><h3>" + party.name + featured + "</h3><p>" + party.venue.name + " - " + sHour + ":" + sMinute + "</p></a></li>";
  			$('#li-tomorrow').after(out);
  			
  		} else  {
@@ -891,19 +884,16 @@ function loadIndex(){
 
 
  	$('#btnCheckin').one('tap', function(event) {
- 		
  		$.mobile.loading('show', {
  			text: 'Checking you in...',
  			textVisible: true,
  			theme: 'a',
-
  		});
  		clicked = true;
  		var eventid = eventObj.id;
  		var facebookShare = $('input[name=checkbox-0]').is(':checked');
  		mixpanel.track("Checkin", {"event" : eventid, "facebook" : facebookShare});
  		if (facebookShare) {
- 				
  			var party = $('#party-header h1').text();
  			var image = $('#posterImg').attr('src');
  			var place = $('#party-venue').text();
@@ -926,8 +916,10 @@ function loadIndex(){
 			  data: {event: eventid},
 		 	  cache: false,
 		 	  timeout: 10000
-		
 			}).done(function( data ) {
+				console.log('posted checkin');
+				console.log(user.id);
+				console.log(eventid);
 				$.mobile.changePage('checkin.html');
 			}).fail(function(jXHR, textStatus) {
 		 		if (textStatus === "timeout") {
