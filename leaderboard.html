@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaderboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="css/jquery.mobile.css" />
+  <link rel="stylesheet" href="css/custom.css" />
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.mobile.js"></script>
+  <script src="js/moment.min.js"></script>
+  <script src="js/jquery.resizecrop.min.js"></script>
+  <script src="cordova.js"></script>
+  <script src="cdv-plugin-fb-connect.js"></script>
+  <script src="facebook_js_sdk.js"></script>
+  <script src="js/app.js"></script>
+</head>
+<body>
+<div data-role="page" id="leaderboard" data-theme="a">
+  <div data-role="content">
+    <div data-role="fieldcontain">
+      <label for="selectmenu1">
+      </label>
+      <select name="" data-theme="b" data-mini="true" id="venues-select">
+      </select>
+    </div>
+
+    <ol data-role="listview" data-divider-theme="b" data-inset="true" id="top3">
+      <li data-role="list-divider" role="heading">
+        Chart
+      </li>
+     
+    </ol>
+    <ol start="69" data-role="listview" data-divider-theme="a" data-inset="true">
+      
+      <li >
+          <span>Rocco S.</span>
+          <span class="ui-li-count">
+            55
+          </span>
+  
+      </li>
+      <li >
+          <span>Ibarbo S.</span>
+          <span class="ui-li-count">
+            55
+          </span>
+  
+      </li>
+          <li data-theme="b">
+          <span><strong>Giangi S.</strong></span>
+          <span class="ui-li-count">
+            35
+          </span>
+  
+      </li>
+          <li >
+          <span>Michele S.</span>
+          <span class="ui-li-count">
+            5
+          </span>
+      </li>
+      <li >
+          <span>Mojito.</span>
+          <span class="ui-li-count">
+            55
+          </span>
+  
+      </li>
+    </ol>
+  </div>
+  <div data-role="footer" data-theme="a" data-position="fixed" ui-fixed-hidden="false">
+      <div data-role="navbar">
+        <ul>
+          <li>
+            <a href="stream.html" data-transition="none" data-icon="footbar-panemerkille-friends" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="#" data-transition="none" data-icon="footbar-panemerkille-parties" data-corners="false" data-iconshadow="false" data-shadow="false" class="ui-btn-active ui-state-persist"></a>
+          </li>
+          <li>
+            <a href="patches.html" data-transition="none" data-icon="footbar-panemerkille-patches" data-corners="false" data-iconshadow="false" data-shadow="false"></a>
+          </li>
+          <li>
+            <a href="profile.html"  data-transition="none" data-icon="footbar-panemerkille-profile" data-corners="false" data-iconshadow="false" data-shadow="false" ></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+</div>
+</body>
+</html>

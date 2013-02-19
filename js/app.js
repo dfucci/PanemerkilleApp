@@ -71,7 +71,56 @@
  });
 
 
+$('#leaderboard').live('pageshow', function(){
+	mixpanel.track("PageView", {"page" : "Leaderboard"});
+ 	$.mobile.loading('show', {
+ 		text: 'Loading the leaderboard...',
+ 		textVisible: true,
+ 		theme: 'a',
 
+ 	});
+ 	$.ajax({
+ 		url: endpoint + "/venues",
+ 		type: "GET",
+ 		dataType: "json",
+ 		cache: false,
+ 	}).done(function(data) {
+ 		var venuesList = $("#venues-select");
+ 		venuesList.append($("<option></option>").attr("value", "all").text("All"));
+ 		for (var i = 0; i < data.length; i++ ){
+ 			var venue = data[i];
+ 			venuesList.append($("<option></option>").attr("value", venue._id).text(venue.name));
+ 		};
+ 		venuesList.selectmenu("refresh");
+
+ 		$.ajax({
+			url: endpoint + "/leaderboard",
+ 			type: "GET",
+ 			dataType: "json",
+ 			cache: false,
+ 		}).done(function(data){
+ 			displayLeaderboard(data);
+ 		}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+
+
+ 		$.mobile.loading('hide');
+
+ 	}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+});
  
  $('#yourpatches').live('pageshow', function(event) {
 	mixpanel.track("PageView", {"page" : "My patches list"});
@@ -290,7 +339,33 @@ function loadIndex(){
  	});
  });
 
+function displayLeaderboard(data){
+	$.mobile.loading('show', {
+ 		text: 'Loading the Leaderboard...',
+ 		textVisible: true,
+ 		theme: 'a',
+ 	});
+	var itsme=false;
+	var theme = "a";
+	var flag = true;
+ 	for(i=0; i<3; i++){
+ 		if(data[i].user._id==user.id){
+ 			itsme=true;
+ 		}
+ 		if(itsme && flag){
+ 			theme = "b";
+ 			flag=false;
+ 		}
+ 		var top3 = $("#top3");
+ 		top3.append($('<li data-theme="'+ theme+'"></li>').html("<span>"+data[i].user.name.firstname +" "+ data[i].user.name.surname[0]+'.</span><span class="ui-li-count">' + data[i].points+ "</span>"));
+ 		theme="a";
+ 		top3.listview("refresh");
+ }
 
+
+$.mobile.loading("hide");
+
+}
 
  function displayStream(prevPage) {
 	 mixpanel.track("PageView", {"page" : "Stream"});
