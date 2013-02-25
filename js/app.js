@@ -70,7 +70,27 @@
 
  });
 
-
+$("#venues-select").live('change', function(event, ui){
+	$("#top3").empty();
+	$("#rank").empty();
+	$("#message").empty();
+	var venue = $("#venues-select option:selected").val();
+	$.ajax({
+			url: endpoint + "/leaderboard/"+venue,
+ 			type: "GET",
+ 			dataType: "json",
+ 			cache: false,
+ 		}).done(function(data){
+ 			displayLeaderboard(data);
+ 		}).fail(function(jXHR, textStatus) {
+ 		if (textStatus === "timeout") {
+ 			$.mobile.changePage('timeoutError.html', {
+ 				transition: 'pop',
+ 				role: 'dialog'
+ 			});
+ 		}
+ 	});
+});
 $('#leaderboard').live('pageshow', function(){
 	mixpanel.track("PageView", {"page" : "Leaderboard"});
  	$.mobile.loading('show', {
@@ -348,22 +368,60 @@ function displayLeaderboard(data){
 	var itsme=false;
 	var theme = "a";
 	var flag = true;
- 	for(i=0; i<3; i++){
- 		if(data[i].user._id==user.id){
- 			itsme=true;
- 		}
- 		if(itsme && flag){
- 			theme = "b";
- 			flag=false;
- 		}
- 		var top3 = $("#top3");
- 		top3.append($('<li data-theme="'+ theme+'"></li>').html("<span>"+data[i].user.name.firstname +" "+ data[i].user.name.surname[0]+'.</span><span class="ui-li-count">' + data[i].points+ "</span>"));
- 		theme="a";
- 		top3.listview("refresh");
- }
+	var top3 = $("#top3");
+	var rank = $("#rank");
+	if (data.length>=3){
+		top3.append('<li data-role="list-divider" role="heading">Top 3</li>');
+	 	for(var i=0; i<3; i++){
+	 		if(data[i].user._id==user.id){
+	 			itsme=true;
+	 		}
+	 		if(itsme && flag){
+	 			theme = "b";
+	 			flag=false;
+	 		}
+	 		top3.append($('<li data-theme="'+ theme+'"></li>').html("<span>"+data[i].user.name.firstname +" "+ data[i].user.name.surname[0]+'.</span><span class="ui-li-count">' + data[i].points+ "</span>"));
+	 		theme="a";
+	 	} 
+	 	if(!itsme){
+	 		var start;
+	 		var meIndex ;
+	 		for(i=3; i<data.length; i++){
+	 			if(data[i].user._id==user.id){
+	 				itsme=true;
+	 			}
+	 			if(itsme){
+	 				meIndex = i;
+	 				if(i==3 || i==4){
+	 					start = 3;
+	 				} else{
+	 					start = i-2;
+	 				}
+	 			console.log(meIndex);
+	 			console.log(start);
+	 			break;
+	 			}
+	 		}
+	 		if(meIndex!=null && meIndex!=undefined){	 			
+	 		rank.attr("start", start+1);
+	 		rank.append('<li data-role="list-divider" role="heading">Leaderboard</li>');
+	 		for(i=start; i<=meIndex+2  && i<data.length; i++){
+	 			if(i==meIndex) theme = "b" ;
+	 			rank.append($('<li data-theme="'+ theme+'"></li>').html("<span>"+data[i].user.name.firstname +" "+ data[i].user.name.surname[0]+'.</span><span class="ui-li-count">' + data[i].points+ "</span>"));
+	 			theme="a";
+	 			}
+	 		} else{
+				$("#message").text("Sorry, you don't seem to be in this leaderboard yet.");
+	 		}
 
-
-$.mobile.loading("hide");
+	 	}
+ 	} 
+ 	else{
+ 		$("#message").text("Sorry, this leaderboard is not ready yet.");
+ 	 }
+	top3.listview("refresh");
+	rank.listview("refresh");
+	$.mobile.loading("hide");
 
 }
 
@@ -383,6 +441,8 @@ $.mobile.loading("hide");
  		cache: false,
  		timeout: 10000
  	}).done(function(friends) {
+
+
  		$("#streamContent").empty();
  		if(friends.length==0){
  			var output = '<p class="italic">It seems that none of your friends has been partying recently! Spread the voice! </p>';

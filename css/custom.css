@@ -165,6 +165,11 @@ a:active {
 	
 	
 }
+
+/* Leaderboard */
+#message {
+	font-style: italic;
+}
 /*Custom Icons*/
 .ui-icon-fbConnect{
 	background-image: url("../images/facebook.png");
