@@ -58,7 +58,7 @@
  		cache: false,
  	}).done(function(data) {
  		displayParties(data);
- 		populateUserFriends();
+ 		//populateUserFriends();
  	}).fail(function(jXHR, textStatus) {
  		if (textStatus === "timeout") {
  			$.mobile.changePage('timeoutError.html', {
@@ -75,6 +75,8 @@ $("#venues-select").live('change', function(event, ui){
 	$("#rank").empty();
 	$("#message").empty();
 	var venue = $("#venues-select option:selected").val();
+
+	if (venue=='all') venue=""; //endpoint = /leaderboard/{emptystring}
 	$.ajax({
 			url: endpoint + "/leaderboard/"+venue,
  			type: "GET",
@@ -90,6 +92,7 @@ $("#venues-select").live('change', function(event, ui){
  			});
  		}
  	});
+
 });
 $('#leaderboard').live('pageshow', function(){
 	mixpanel.track("PageView", {"page" : "Leaderboard"});
@@ -106,10 +109,14 @@ $('#leaderboard').live('pageshow', function(){
  		cache: false,
  	}).done(function(data) {
  		var venuesList = $("#venues-select");
- 		venuesList.append($("<option></option>").attr("value", "all").text("All"));
+ 		venuesList.append($("<option></option>").attr("value", "all").text("General"));
  		for (var i = 0; i < data.length; i++ ){
  			var venue = data[i];
- 			venuesList.append($("<option></option>").attr("value", venue._id).text(venue.name));
+ 			var featured = ""
+ 			if(venue.featured){
+ 				featured = " \u2605";
+ 			}
+ 			venuesList.append($("<option></option>").attr("value", venue._id).text(venue.name + featured));
  		};
  		venuesList.selectmenu("refresh");
 
