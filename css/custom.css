@@ -132,7 +132,9 @@ a:active {
 .locked {
 	opacity: 0.3;
 }
-
+.patch-image{
+	max-width: 25%;
+}
 
 #singlepatch{
 	max-width:65%;

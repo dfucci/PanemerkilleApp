@@ -527,6 +527,9 @@ function displayLeaderboard(data){
  	for (var i = 0; i < allCheckins.length; i++) {
  		if (allCheckins[i].event.venue == venueObj.id) total++;
  	}
+ 	var points="1 more point";
+ 	if(venueObj.featured) points="2 more points";
+ 	$("#points-venue").html(points);
  	if (total == 1) $("#number-checkins-venue").html('once');
  	else $("#number-checkins-venue").html(total + ' times');
  	var unseen = new Array();
@@ -539,7 +542,7 @@ function displayLeaderboard(data){
 
  	$('.list-patch').remove()
  	if (unseen.length == 0) {
- 		$("#divider-unlocked").after('<li class="list-patch"><p class="italic">Sorry, this time you did not unlock any patch :-( Keep on coming and checking in!</p></li>');
+ 		$("#checked-content").append('<p class="italic">Sorry, this time you did not unlock any patch :-( Keep on coming and checking in!</p>');
  		$('#liview-checkin').listview('refresh');
  		$.mobile.loading('hide');
  	} else {
@@ -555,13 +558,15 @@ function displayLeaderboard(data){
  			}).done(function(patch) {
  				mixpanel.track('Patch unlocked', {'patch':patch.name, 'user': user.id});
  				var output = "";
- 				output += '<li data-patch="' + patch._id + '" data-claimed="false" class="list-patch">';
- 				output += '<a  href="patch.html">';
- 				output += '<img src="' + patch.image_url + '" class="ui-li-thumb">';
- 				output += '<h3 class="ui-li-heading">' + patch.name + '</h3>'
- 				output += '<p class="ui-li-desc">' + patch.description + '</p>';
- 				output += '</a></li>';
- 				$("#divider-unlocked").after(output);
+ 				output += '<div>';
+ 				output += '<img class="patch-image" src="' + patch.image_url + '"/>';
+ 				output += '<h3>' + patch.name + '</h3>'
+ 				output += '<p>' + patch.description + '</p>';
+ 				output += '<a  href="patch.html" data-role="button" id="claim-patch-btn" data-patch="' + patch._id + '" data-claimed="false">Claim</a>';
+ 				output += '<a data-role="button" data-rel="back" id="cancel-patch-btn" data-theme="b">No, I\'ll do it later</a></div>';
+ 				console.log(output);
+ 				$("#checked-content").append(output);
+ 				$("#checkedin-page").trigger("pagecreate");
  				count++;
  				if (count == unseen.length){
  			 		$('#liview-checkin').listview('refresh');
@@ -1021,6 +1026,7 @@ function displayLeaderboard(data){
  	venueObj.lon = data.venue.lon;
  	venueObj.name = data.venue.name;
  	venueObj.id = data.venue._id;
+ 	venueObj.featured = data.venue.featured;
 
  	eventObj.name = data.name;
  	enableCheckinBtn();
@@ -1067,7 +1073,11 @@ function displayLeaderboard(data){
 				console.log('posted checkin');
 				console.log(user.id);
 				console.log(eventid);
-				$.mobile.changePage('checkin.html');
+				$.mobile.changePage('checkin.html',{
+					transition: 'pop',
+					role: 'dialog'
+				});
+			
 			}).fail(function(jXHR, textStatus) {
 		 		if (textStatus === "timeout") {
 		 			console.log("Timeout exceeded!");
