@@ -136,6 +136,11 @@ a:active {
 	max-width: 25%;
 }
 
+.patch-won{
+	max-width:35%;
+	margin-top:15px;
+
+}
 #singlepatch{
 	max-width:65%;
 	max-height:65%;
@@ -285,8 +290,29 @@ left: 6px !important;
 top: 4px !important;
 }
 
+#checkedin-page .ui-dialog-contain{
+	margin-top:0;
+}
 
 
+.patch-message{
+	margin-top:25px;
+	margin-bottom:10px;
+	font-size:0.8em;
+}
+.patch-title{
+	font-size:0.8em;
+	margin:10 0 5 0;
+ }
+
+.patch-desc{
+	font-size:0.7em;
+	margin:0 0 10 0;
+}
+
+#patch-container{
+	text-align:center;
+}
 .warningIcon {
 	text-align: center;
 }
