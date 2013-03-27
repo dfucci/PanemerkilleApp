@@ -1311,7 +1311,7 @@
  	});
  	if (ui.prevPage.attr('id') == 'checkedin-page') {
 
- 		$('#patch-back').hide();
+ 		$('#patch-back').show();
  		$('#patch-done').hide();
  	} else {
  		$('#patch-back').show();
