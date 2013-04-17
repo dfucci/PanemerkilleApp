@@ -555,7 +555,7 @@
 
  	$('.list-patch').remove()
  	if (unseen.length == 0) {
- 		$("#checked-content").append('<p class="italic">Sorry, this time you did not unlock any patch :-( Keep on coming and checking in!</p>');
+ 		$("#checked-content").html('<p class="italic">Sorry, this time you did not unlock any patch :-( Keep on coming and checking in!</p>');
  		$('#liview-checkin').listview('refresh');
  		$.mobile.loading('hide');
  	} else {
@@ -581,8 +581,7 @@
  				output += '<p class="patch-desc">' + patch.description + '</p>';
  				output += '<a  href="patch.html" data-role="button" class="claim-patch-btn" data-patch="' + patch._id + '" data-claimed="false" data-mini="true">Claim</a>';
  				output += '<a data-role="button" data-rel="back" class="cancel-patch-btn" data-theme="b" data-mini="true">No, I\'ll do it later</a></div>';
- 				console.log(output);
- 				$("#checked-content").append(output);
+ 				$("#checked-content").html(output);
  				$("#checkedin-page").trigger("pagecreate");
  				count++;
  				if (count == unseen.length) {
