@@ -1212,7 +1212,7 @@
  		});
  		navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError, {
  			enableHighAccuracy: true,
- 			maxiumAge: 60000,
+ 			maximumAge: 60000,
  			timeout: 15000
  		});
  	}).fail(function(jXHR, textStatus) {
